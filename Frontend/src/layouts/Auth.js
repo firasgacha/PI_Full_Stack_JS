@@ -10,8 +10,6 @@ import FooterSmall from "components/Footers/FooterSmall.js";
 
 import Login from "views/auth/Login.js";
 import Register from "views/auth/Register.js";
-import Dashboard from "../views/auth/Dashboard.js";
-
 export default function Auth() {
   return (
     <>

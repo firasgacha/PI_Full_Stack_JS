@@ -5,11 +5,17 @@ const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+app.use(express.json({limit: '25mb'}));
+
 
 app.use(cors())
 app.use(express.json())
+const DB = 'mongodb+srv://Ahmedjelassi:Langue123@pidev.3zlxb.mongodb.net/Pidev?retryWrites=true&w=majority'
 
-mongoose.connect('mongodb://localhost:27017/Pidev')
+mongoose.connect(DB,{useNewUrlParser: true,
+    useUnifiedTopology: true }).then(()=>{
+    console.log('connection successfull')
+}).catch((error)=>console.log(error))
 
 app.post('/api/register', async (req, res) => {
 
@@ -19,6 +25,8 @@ app.post('/api/register', async (req, res) => {
         await User.create({
             name: req.body.name,
             email: req.body.email,
+            address : req.body.address,
+            image : req.body.image,
             password: newPassword,
         })
         res.json({ status: 'ok' })
@@ -30,8 +38,8 @@ app.post('/api/register', async (req, res) => {
 } )
 
 app.post('/api/login', async (req, res) => {
-        const user = await User.findOne({ email: req.body.email})
-        const isPasswordValid = await bcrypt.compare(req.body.password, user.password)
+    const user = await User.findOne({ email: req.body.email})
+    const isPasswordValid = await bcrypt.compare(req.body.password, user.password)
     if(!user){
         return { status: 'error', error: 'invalid login'}
     }
@@ -69,6 +77,23 @@ app.get('/api/quote', async (req, res) => {
 
 } )
 
+app.get('/api/user', async (req, res) => {
+    const token = req.headers['x-access-token']
+    try {
+
+        const decoded = jwt.verify(token, 'secret123')
+        const email = decoded.email
+        const user = await User.findOne({ email:email})
+        return res.json({ status:'ok', name : user.name , address : user.address})
+
+    }catch(error){
+        console.log(error)
+        res.json({status:'error', error: 'invalid token'})
+
+    }
+
+} )
+
 
 app.post('/api/quote', async (req, res) => {
     const token = req.headers['x-access-token']
@@ -77,13 +102,13 @@ app.post('/api/quote', async (req, res) => {
         const decoded = jwt.verify(token, 'secret123')
         const email = decoded.email
         await User.updateOne({ email:email},{ $set: {
-            quote : req.body.quote
+                quote : req.body.quote
             }})
         return res.json({ status:'ok'})
 
     }catch(error){
         console.log(error)
-       return res.json({status:'error', error: 'invalid token'})
+        return res.json({status:'error', error: 'invalid token'})
 
     }
 
