@@ -5,6 +5,9 @@ const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const Complaint = require("./routes/Complaint");
+
+
 app.use(express.json({limit: '25mb'}));
 
 
@@ -16,6 +19,13 @@ mongoose.connect(DB,{useNewUrlParser: true,
     useUnifiedTopology: true }).then(()=>{
     console.log('connection successfull')
 }).catch((error)=>console.log(error))
+
+// Use Routes
+app.use('/complaint',Complaint);
+
+
+
+
 
 app.post('/api/register', async (req, res) => {
 
