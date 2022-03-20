@@ -2,6 +2,7 @@ const express = require ('express');
 const router = express.Router();
 
 
+
 const {
     getOneComplaint,
     getComplaint,
@@ -10,10 +11,15 @@ const {
     deleteComplaint
 }= require ('../controllers/Complaint.js')
 
-router.get('/addComplaint',addComplaint);
-router.get('/updateComplaint/:id',updateComplaint);
-router.get('/deleteComplaint/:id',deleteComplaint);
+//DONE ADD
+router.post('/addComplaint',addComplaint);
+//DONE UPDATE SHOULD enter the id filed
+router.put('/updateComplaint/:id',updateComplaint);
+
+router.delete('/deleteComplaint/:id',deleteComplaint);
+//DONE GET ALL
 router.get('/getComplaints',getComplaint);
+//DONE GET One 
 router.get('/getOneComplaint/:id',getOneComplaint);
 
 module.exports = router;
