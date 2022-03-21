@@ -5,14 +5,26 @@ module.exports = {
 
     getOneComplaint: (req, res) => {
         try {
-            Complaint.findById(req.params.id).then((complaint) => res.json(complaint));
+            Complaint.findById(req.params.id).then((data) => res.json(
+                {
+                    status: "SUCCESS",
+                    message: "complaint found",
+                    data
+                }
+            ));
         } catch (error) {
             res.status(404).json({ message: error.message })
         }
     },
     getComplaint: (req, res, next) => {
         try {
-            Complaint.find().then((comp) => res.json(comp));
+            Complaint.find().then((data) => res.json(
+                {
+                    status: "SUCCESS",
+                    message: "Complaints found",
+                    data
+                }
+            ));
         } catch (error) {
             res.status(404).json({ message: error.message });
         }
@@ -22,7 +34,10 @@ module.exports = {
         const newComplaint = new Complaint(complaint);
         try {
             newComplaint.save();
-            res.status(201).json(newComplaint);
+            res.status(201).json({
+                status: "SUCCESS",
+                message: "Complaint Sended", newComplaint
+            });
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
