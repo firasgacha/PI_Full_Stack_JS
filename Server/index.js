@@ -8,6 +8,8 @@ const bcrypt = require('bcryptjs')
 const Complaint = require("./routes/Complaint");
 
 
+
+
 app.use(express.json({limit: '25mb'}));
 
 
@@ -94,7 +96,7 @@ app.get('/api/user', async (req, res) => {
         const decoded = jwt.verify(token, 'secret123')
         const email = decoded.email
         const user = await User.findOne({ email:email})
-        return res.json({ status:'ok', name : user.name , address : user.address})
+        return res.json({ status:'ok',id : user.id,name : user.name , address : user.address})
 
     }catch(error){
         console.log(error)
@@ -124,6 +126,6 @@ app.post('/api/quote', async (req, res) => {
 
 } )
 
-app. listen(1337, () => {
+app.listen(1337, () => {
     console.log('Server started on 1337')
 })

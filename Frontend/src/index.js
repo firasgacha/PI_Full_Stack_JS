@@ -24,6 +24,7 @@ ReactDOM.render(
       <Route path="/admin" component={Admin} />
       <Route path="/auth" component={Auth} />
       {/* add routes without layouts */}
+      {/* <Route path="/chat" component={Chat} /> */}
       <Route path="/complaint" component={AddComplaint} />
       <Route path="/dashboard" exact component={Dashboard} />
       <Route path="/landing" exact component={Landing} />

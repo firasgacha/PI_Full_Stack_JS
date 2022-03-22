@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
 import * as api from '../../api/ComplaintApi';
+import jwt from "jsonwebtoken";
 
 
 export const SendComplaint = () => {
@@ -9,10 +10,24 @@ export const SendComplaint = () => {
   const [type, setType] = useState("");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
+  const [userId, setUser] = useState("");
 
-
+ async function getUser(){
+  const req = await fetch('http://localhost:1337/api/user',{
+    headers:{
+      'x-access-token': localStorage.getItem('token')
+    }
+  });
+  const data = await req.json();
+   if (data.status === 'ok'){
+    setUser(data.id);
+    console.log(userId);
+  }else{
+    alert(data.error)
+  }
+ }
   const handleSubmite = () => {
-    const Credentials = { type, image, description }
+    const Credentials = { type, image, description ,userId}
     const result = api.createComplaint(Credentials)
       .then(response => {
         const result = response.data;
@@ -29,6 +44,18 @@ export const SendComplaint = () => {
         console.log(err)
       })
   }
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      const user = jwt.decode(token)
+      if (!user) {
+        localStorage.removeItem('token')
+      }else {
+        getUser();
+      }
+    }
+
+  },[]);
   return (
     <>
       <Navbar transparent />

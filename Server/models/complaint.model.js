@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const Complaint = new mongoose.Schema({
     type: { type: String, required: true },
-    description: { type: String },
+    description: { type: String, required:false },
     status: { type: String, default: 'Open' },
-    image: { type: String },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'UserData' },
+    image: { type: String, required:false },
+    userId: { type: String, required:false },
     msgs: [
         {
             from: { type: String },
