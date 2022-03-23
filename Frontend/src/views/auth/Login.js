@@ -1,30 +1,46 @@
 import React, {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import axios from 'axios'
+import {showErrMsg, showSuccessMsg} from "../../components/utils/notification/Notification";
+import {dispatchLogin} from "../../redux/actions/authAction";
+import {useDispatch} from 'react-redux'
+
+const initialState = {
+  email: '',
+  password: '',
+  err: '',
+  success: ''
+}
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword]  = useState('')
-  async function loginUser(event) {
-    event.preventDefault()
-    const response = await fetch('http://localhost:1337/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    })
-    const data = await response.json()
-    if(data.user){
-      localStorage.setItem('token', data.user)
-      alert('login successful')
-      window.location.href = '/profile'
-    }else{
-      alert('Please check your informations')
-    }
+  
+  const [user, setUser] = useState(initialState)
+  const dispatch = useDispatch()
+  const history = useHistory()
+
+  const {email, password, err, success} = user
+  const handleChangeInput = e => {
+    const {name, value} = e.target
+    setUser({...user, [name]:value, err: '', success: ''})
   }
+
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    try{
+      const res = await axios.post('http://localhost:5000/user/login', {email, password})
+      setUser({...user, err:'', success: res.data.msg})
+      localStorage.setItem('fistLogin', true)
+      dispatch(dispatchLogin())
+      history.push("/")
+    }catch(err){
+      err.response.data.msg &&
+      setUser({...user, err: err.response.data.msg, success: ''})
+    }
+
+  }
+
+
   return (
       <>
         <div className="container mx-auto px-4 h-full">
@@ -67,7 +83,9 @@ export default function Login() {
                   <div className="text-blueGray-400 text-center mb-3 font-bold">
                     <small>Or sign in with credentials</small>
                   </div>
-                  <form onSubmit={loginUser}>
+                  {err && showErrMsg(err)}
+                  {success && showSuccessMsg(success)}
+                  <form onSubmit={handleSubmit}>
                     <div className="relative w-full mb-3">
                       <label
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
@@ -76,11 +94,13 @@ export default function Login() {
                         Email
                       </label>
                       <input
-                          value={email}
-                          onChange={(e)=>setEmail(e.target.value)}
                           type="email"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           placeholder="Email"
+                          id="email"
+                          value={email}
+                          name="email"
+                          onChange={handleChangeInput}
                       />
                     </div>
 
@@ -92,11 +112,13 @@ export default function Login() {
                         Password
                       </label>
                       <input
-                          value={password}
-                          onChange={(e)=>setPassword(e.target.value)}
                           type="password"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           placeholder="Password"
+                          id="password"
+                          value={password}
+                          name="password"
+                          onChange={handleChangeInput}
                       />
                     </div>
                     <div>
@@ -126,13 +148,9 @@ export default function Login() {
               </div>
               <div className="flex flex-wrap mt-6 relative">
                 <div className="w-1/2">
-                  <a
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      className="text-blueGray-200"
-                  >
-                    <small>Forgot password?</small>
-                  </a>
+                  <Link to="/forogt_password" className="text-blueGray-200">
+                    <small>Forgot password</small>
+                  </Link>
                 </div>
                 <div className="w-1/2 text-right">
                   <Link to="/auth/register" className="text-blueGray-200">

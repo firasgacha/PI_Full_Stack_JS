@@ -1,36 +1,53 @@
 import React from "react";
-import FileBase64 from "react-file-base64";
 import {useState} from "react";
-import {useHistory} from "react-router-dom";
+import {showErrMsg, showSuccessMsg} from "../../components/utils/notification/Notification";
+import axios from "axios";
+import {isEmpty, isEmail, isLength, isMatch} from '../../components/utils/validation/Validation'
 
+const initialState = {
+  name: '',
+  email: '',
+  password: '',
+  cf_password: '',
+  address:'',
+  city: '',
+  state: '',
+  zip: '',
+  country: '',
+  telephone: '',
+  err: '',
+  success: ''
+}
 export default function Register() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword]  = useState('')
-  const [address,setAddress] = useState('')
-  const [image,setImage] = useState('')
-  const history = useHistory()
+  const [user, setUser] = useState(initialState)
 
-  async function registerUser(event) {
-    event.preventDefault()
-    const response = await fetch('http://localhost:1337/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        address,
-        image
-      }),
-    })
-    const data = await response.json()
-    if(data.status === 'ok'){
-      history.push('/auth/login')
+  const {name,email, password, cf_password,address,city,state,zip,country,telephone,err, success} = user
+  const handleChangeInput = e => {
+    const {name, value} = e.target
+    setUser({...user, [name]:value, err: '', success: ''})
+  }
 
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    if(isEmpty(name) ||isEmpty(password) ||isEmpty(address) ||isEmpty(city) ||isEmpty(state) ||isEmpty(zip)  ||isEmpty(country) ||isEmpty(telephone)  )
+      return setUser({...user, err: "Please fill in all fields", success:''})
+    if(!isEmail(email))
+      return setUser({...user, err: "Invalid Email", success:''})
+    if(isLength(password))
+      return setUser({...user, err: "Password must be at least 6 characters", success:''})
+    if(!isMatch(password ,cf_password))
+      return setUser({...user, err: "Password did not match", success:''})
+    try{
+        const res = await axios.post('http://localhost:5000/user/register',{
+          name,email, password,address,city,state,zip,country,telephone
+        })
+      setUser({...user, err:'', success: res.data.msg})
+    }catch(err){
+      err.response.data.msg &&
+      setUser({...user, err: err.response.data.msg, success: ''})
     }
+
   }
 
   return (
@@ -75,7 +92,9 @@ export default function Register() {
                   <div className="text-blueGray-400 text-center mb-3 font-bold">
                     <small>Or sign up with credentials</small>
                   </div>
-                  <form onSubmit={registerUser}>
+                  {err && showErrMsg(err)}
+                  {success && showSuccessMsg(success)}
+                  <form onSubmit={handleSubmit}>
                     <div className="relative w-full mb-3">
                       <label
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
@@ -84,11 +103,10 @@ export default function Register() {
                         Name
                       </label>
                       <input
-                          value={name}
-                          onChange={(e)=> setName(e.target.value)}
                           type="text"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           placeholder="Name"
+                          id="name" value={name} name="name" onChange={handleChangeInput}
                       />
                     </div>
 
@@ -100,28 +118,13 @@ export default function Register() {
                         Email
                       </label>
                       <input
-                          value={email}
-                          onChange={(e)=> setEmail(e.target.value)}
                           type="email"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           placeholder="Email"
+                          id="email" value={email} name="email" onChange={handleChangeInput}
                       />
                     </div>
-                    <div className="relative w-full mb-3">
-                      <label
-                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                          htmlFor="grid-password"
-                      >
-                        Address
-                      </label>
-                      <input
-                          value={address}
-                          onChange={(e)=> setAddress(e.target.value)}
-                          type="text"
-                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                          placeholder="Address"
-                      />
-                    </div>
+
 
 
                     <div className="relative w-full mb-3">
@@ -132,13 +135,111 @@ export default function Register() {
                         Password
                       </label>
                       <input
-                          value={password}
-                          onChange={(e)=>setPassword(e.target.value)}
                           type="password"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           placeholder="Password"
+                          id="password" value={password} name="password" onChange={handleChangeInput}
                       />
                     </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        Confirm password
+                      </label>
+                      <input
+                          type="password"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Confirm password"
+                          id="cf_password" value={cf_password} name="cf_password" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        Address
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Address"
+                          id="address" value={address} name="address" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        City
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="City"
+                          id="city" value={city} name="city" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        State
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="State"
+                          id="state" value={state} name="state" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        Zip/Postal code
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Zip/Postal code"
+                          id="zip" value={zip} name="zip" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        Country
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Country"
+                          id="country" value={country} name="country" onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="relative w-full mb-3">
+                      <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                      >
+                        Telephone
+                      </label>
+                      <input
+                          type="text"
+                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          placeholder="Telephone number"
+                          id="telephone" value={telephone} name="telephone" onChange={handleChangeInput}
+                      />
+                    </div>
+
 
                     <div>
                       <label className="inline-flex items-center cursor-pointer">

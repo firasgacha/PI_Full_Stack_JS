@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 export default function Profile() {
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const [image,setImage] = useState('')
 
   async function populateName() {
 
@@ -19,6 +20,7 @@ export default function Profile() {
     if (data.status === 'ok'){
       setName(data.name)
       setAddress(data.address)
+      setImage(data.image)
     }else{
       alert(data.error)
     }
@@ -81,7 +83,7 @@ export default function Profile() {
                       <div className="relative">
                         <img
                             alt="..."
-                            src={require("assets/img/team-2-800x800.jpg").default}
+                            src={image}
                             className="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px"
                         />
                       </div>
