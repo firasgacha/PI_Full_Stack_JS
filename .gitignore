@@ -1,0 +1,4 @@
+
+*.markdown
+Server/node_modules/minimist/.travis.yml
+Server/node_modules/.package-lock.json
