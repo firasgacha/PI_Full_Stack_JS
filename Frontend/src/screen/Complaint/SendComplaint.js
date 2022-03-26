@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
-import * as api from '../../api/ComplaintApi';
+import * as api from '../../api/Api';
 import jwt from "jsonwebtoken";
-
+import axios from "axios";
 
 export const SendComplaint = () => {
   //Define here local state that store the form Data
   const [type, setType] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
   const [userId, setUser] = useState("");
 
@@ -23,7 +23,8 @@ export const SendComplaint = () => {
     setUser(data.id);
     console.log(userId);
   }else{
-    alert(data.error)
+    alert(data.error);
+    window.location.href = '/auth';
   }
  }
   const handleSubmite = () => {
@@ -44,12 +45,26 @@ export const SendComplaint = () => {
         console.log(err)
       })
   }
+  const handleUpload = () => {
+    console.log("handle upload")
+    axios.post('http://localhost:1337/image-upload',image)
+    .then(res => { console.log('Axios response: ',res)})
+  }
+  const handleFileInput = (e) => {
+    console.log('handleFileInput working!')
+    console.log(e.target.files[0]);
+    const formData = new FormData(); 
+    formData.append('my-image-file', e.target.files[0], e.target.files[0].name);
+    const filelocation = 'my-image-file' + '_dateVal_'+Date.now()+ e.target.files[0].name.toString();
+    setImage(filelocation.toString());
+    console.log(filelocation);
+  }
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
       const user = jwt.decode(token)
       if (!user) {
-        localStorage.removeItem('token')
+        localStorage.removeItem('token');
       }else {
         getUser();
       }
@@ -132,13 +147,16 @@ export const SendComplaint = () => {
                     >
                       Upload Your Screen Shot
                     </label>
-                    <input
-                      type="text"
+                    {/* <input
+                      type="file"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       placeholder="Upload Your Screen Shot"
                       name="image"
                       // value={image}
-                      onChange={(e) => setImage(e.target.value)} />
+                      onChange={getFileInfo} />
+                      <button onClick={handleUpload}>Upload</button> */}
+                      <button onClick={handleUpload}>Upload!</button>
+                      <input type="file" onChange={handleFileInput}/>
                   </div>
 
                   <div className="relative w-full mb-3">

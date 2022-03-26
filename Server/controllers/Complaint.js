@@ -8,7 +8,7 @@ module.exports = {
             Complaint.findById(req.params.id).then((data) => res.json(
                 {
                     status: "SUCCESS",
-                    message: "complaint found",
+                    message: "Complaint Found",
                     data
                 }
             ));

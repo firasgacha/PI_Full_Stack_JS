@@ -1,10 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
-import * as api from '../../api/ComplaintApi';
+import * as api from '../../api/Api';
+import axios from 'axios';
 
 export const GetComplaintsData = () => {
     const color = "light";
     const [Data, setData] = useState([]);
+    const [User, setUser] = useState([]);
+    const [id,setId] = useState("");
+    
+    // Get User data By ID
+    const GetUserById = () => {
+      const url = `http://localhost:1337/user/getOneUser/${id}`;
+      axios.get(url)
+      .then(response => {
+        const result = response.data;
+        const { status, message, data } = result;
+        if (status !== 'SUCCESS') {
+          alert(message, status)
+      }
+      else {
+          setUser(data);
+          console.log(result);
+      }
+      }).catch(err => {console.log(err)})
+    };
+
+    // Get All Complaints Data
     const GetComplaintsData = () => {
         const result = api.getAllComplaint()
         .then(response => {
@@ -20,7 +42,9 @@ export const GetComplaintsData = () => {
       }) .catch(err => {console.log(err)})
     }
    
-    useEffect(() => {GetComplaintsData();}, [])
+    useEffect(() => {
+      GetComplaintsData();
+    },[]);
     
     return (
         <>
@@ -114,7 +138,8 @@ export const GetComplaintsData = () => {
                   {Data.map((item) => 
                   <tr key={item.id}>
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                      {item.user}
+                      {/* <button  type='button'onClick={()=>{GetUserById,setId(item.userId)}}>Profile</button> */}
+                      {/* {item.userId} */}
                     </th>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       {item.type}

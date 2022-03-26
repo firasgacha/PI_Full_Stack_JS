@@ -6,14 +6,48 @@ const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const Complaint = require("./routes/Complaint");
+const UserRoute = require("./routes/User");
+//upload image //////////////////////////////////
+const multer = require('multer');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+const corsOrigin = 'http://localhost:3000';
+app.use(cors()); 
+
+const imageUploadPath = 'C:/Users/Firas GACHA/Desktop/PI_Full_Stack_JS/Frontend/uploaded_files';
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, imageUploadPath)
+  },
+  filename: function(req, file, cb) {
+    cb(null, `${file.fieldname}_dateVal_${Date.now()}_${file.originalname}`)
+  }
+})
+
+const imageUpload = multer({storage: storage})
+
+app.post('/image-upload', imageUpload.array("my-image-file"), (req, res) => {
+  console.log('POST request received to /image-upload.');
+  console.log('Axios POST body: ', req.body);
+  res.send('POST request recieved on server to /image-upload.');
+})
+
+// const port = 4000;
+// app.listen(port, process.env.IP, function(){
+//   console.log(`Server is running on port ${port}`);
+// });
 
 
-
+//upload image //////////////////////////////////
 
 app.use(express.json({limit: '25mb'}));
 
 
-app.use(cors())
+
 app.use(express.json())
 const DB = 'mongodb+srv://Ahmedjelassi:Langue123@pidev.3zlxb.mongodb.net/Pidev?retryWrites=true&w=majority'
 
@@ -24,7 +58,7 @@ mongoose.connect(DB,{useNewUrlParser: true,
 
 // Use Routes
 app.use('/complaint',Complaint);
-
+app.use('/user', UserRoute);
 
 
 
@@ -92,7 +126,6 @@ app.get('/api/quote', async (req, res) => {
 app.get('/api/user', async (req, res) => {
     const token = req.headers['x-access-token']
     try {
-
         const decoded = jwt.verify(token, 'secret123')
         const email = decoded.email
         const user = await User.findOne({ email:email})
@@ -129,3 +162,6 @@ app.post('/api/quote', async (req, res) => {
 app.listen(1337, () => {
     console.log('Server started on 1337')
 })
+
+
+
