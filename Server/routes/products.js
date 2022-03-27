@@ -34,7 +34,7 @@ router.post('/', async function (req, res)  {
     }
 });
 
-router.post('/add',  upload.array('multi-files'), async function (req, res) {
+router.post('/add',  upload.array('multi_files'), async function (req, res) {
     var cat=new Categorie(
         {
             name:req.body.categorie
@@ -51,10 +51,10 @@ router.post('/add',  upload.array('multi-files'), async function (req, res) {
     for(var file in req.files)
         prod.Images.push(new Image({ img:req.files[file]['filename']}));
     prod.save();
-    res.redirect('/products/get');
+    // res.redirect('/products/get');
 });
 
-router.post('/update', upload.array('multi-files'), async function (req, res) {
+router.post('/update', upload.array('multi_files'), async function (req, res) {
     var cat=new Categorie(
         {
             name:req.body.categorie
@@ -73,12 +73,13 @@ router.post('/update', upload.array('multi-files'), async function (req, res) {
             docproduct.Images.push(new Image({img: req.files[file]['filename']}));
     }
     await docproduct.save();
-    res.redirect('/products/get');
+    // res.redirect('/products/get');
 });
 
 router.post('/delete', async function (req, res) {
+    console.log(req.body)
         await Product.findByIdAndDelete(req.body.id_p).exec();
-        res.redirect('/products/get');
+        // res.redirect('/products/get');
 });
 
 router.get('/get',prodcutsController.getproducts );
