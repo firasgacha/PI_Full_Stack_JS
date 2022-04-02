@@ -1,7 +1,22 @@
 import React from "react";
 import { createPopper } from "@popperjs/core";
+import {useSelector} from "react-redux";
+import {Link} from "react-router-dom";
+import axios from "axios";
 
 const UserDropdown = () => {
+    const auth = useSelector(state => state.auth)
+    const {user } = auth
+    //Logout
+    const handleLogout = async () =>{
+        try{
+            await axios.get('/user/logout')
+            localStorage.removeItem('firstLogin')
+            window.location.href = '/'
+
+        }catch(err){
+            console.log(err.message)  }
+    }
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
@@ -31,7 +46,7 @@ const UserDropdown = () => {
             <img
               alt="..."
               className="w-full rounded-full align-middle border-none shadow-lg"
-              src={require("assets/img/team-1-800x800.jpg").default}
+              src={user.avatar}
             />
           </span>
         </div>
@@ -62,23 +77,21 @@ const UserDropdown = () => {
           Another action
         </a>
         <a
-          href="#pablo"
           className={
             "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
           }
           onClick={(e) => e.preventDefault()}
         >
-          Something else here
+            <Link to="/Profile">Profile</Link>
         </a>
         <div className="h-0 my-2 border border-solid border-blueGray-100" />
         <a
-          href="#pablo"
           className={
             "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
           }
           onClick={(e) => e.preventDefault()}
         >
-          Seprated link
+          <Link to="/" onClick={handleLogout}>Logout</Link>
         </a>
       </div>
     </>

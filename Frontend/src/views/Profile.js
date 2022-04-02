@@ -2,41 +2,135 @@ import React, {useEffect, useState} from "react";
 
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
-import jwt from "jsonwebtoken";
+import {isLength, isMatch} from "components/utils/validation/Validation"
+import {showSuccessMsg, showErrMsg} from "components/utils/notification/Notification"
+import {fetchAllUsers,dispatchGetAllUsers} from "../redux/actions/userActions";
+import {useDispatch, useSelector} from "react-redux";
+import axios from "axios";
+import {Link} from "react-router-dom";
+
+
+const initialState = {
+  name: '',
+  password: '',
+  address: '',
+  cf_password: '',
+  err: '',
+  success: ''
+}
 
 export default function Profile() {
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
-  const [image,setImage] = useState('')
+  const auth = useSelector(state => state.auth)
+  const token = useSelector(state => state.token)
+  const users = useSelector(state => state.users)
 
-  async function populateName() {
 
-    const req = await fetch('http://localhost:1337/api/user',{
-      headers:{
-        'x-access-token': localStorage.getItem('token')
-      }
-    })
-    const data = await req.json()
-    if (data.status === 'ok'){
-      setName(data.name)
-      setAddress(data.address)
-      setImage(data.image)
-    }else{
-      alert(data.error)
+  const{user, isAdmin} = auth
+  const [data,setData] = useState(initialState)
+  const {name, email,password, address, cf_password, err, success} = data
+  const [avatar, setAvatar] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [callback , setCallback] = useState(false)
+
+  const dispatch = useDispatch()
+  useEffect(() => {
+    if(isAdmin){
+      fetchAllUsers(token).then(res =>{
+        dispatch(dispatchGetAllUsers(res))
+      })
+    }
+  },[token, isAdmin, dispatch, callback])
+
+  const changeAvatar = async(e) => {
+    e.preventDefault()
+    try {
+      const file = e.target.files[0]
+
+      if(!file) return setData({...data, err: "No files were uploaded." , success: ''})
+
+      if(file.size > 1024 * 1024)
+        return setData({...data, err: "Size too large." , success: ''})
+
+      if(file.type !== 'image/jpeg' && file.type !== 'image/png')
+        return setData({...data, err: "File format is incorrect." , success: ''})
+
+      let formData =  new FormData()
+      formData.append('file', file)
+
+      setLoading(true)
+      const res = await axios.post('/api/upload_avatar', formData, {
+        headers: {'content-type': 'multipart/form-data', Authorization: token}
+      })
+
+      setLoading(false)
+      setAvatar(res.data.url)
+
+    } catch (err) {
+      setData({...data, err: err.response.data.msg , success: ''})
     }
   }
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      const user = jwt.decode(token)
-      if (!user) {
-        localStorage.removeItem('token')
-      }else {
-        populateName()
-      }
-    }
+  const handleChange = e => {
+    const {name, value} = e.target
+    setData({...data, [name]: value, err: '', success: ''})
+  }
+  const updateInfo = () => {
+    try {
+          axios.patch('/user/update',{
+            name: name ? name : user.name,
+            address: address ? address: user.address,
+            avatar: avatar ? avatar : user.avatar
+          },{
+            headers: {Authorization: token}
+          })
 
-  }, [])
+      setData({...data, err: '' , success: "Updated Success!"})
+
+    }catch(err){
+      setData({...data, err: err.response.data.msg , success: ''})
+    }
+  }
+
+  const updatePassword = () => {
+    if(isLength(password))
+      return setData({...data, err: "Password must be at least 6 characters.", success: ''})
+
+    if(!isMatch(password, cf_password))
+      return setData({...data, err: "Password did not match.", success: ''})
+
+    try {
+      axios.post('/user/reset', {password},{
+        headers: {Authorization: token}
+      })
+
+      setData({...data, err: '' , success: "Updated Success!"})
+    } catch (err) {
+      setData({...data, err: err.response.data.msg , success: ''})
+    }
+  }
+
+  const handleUpdate = () => {
+    if(name || avatar || address) updateInfo()
+    if(password) updatePassword()
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      if(user._id !== id){
+        if(window.confirm("Are you sure you want to delete this account?")){
+          setLoading(true)
+          await axios.delete(`/user/delete/${id}`, {
+            headers: {Authorization: token}
+          })
+          setLoading(false)
+          setCallback(!callback)
+        }
+      }
+
+    } catch (err) {
+      setData({...data, err: err.response.data.msg , success: ''})
+    }
+  }
+
   return (
       <>
         <Navbar transparent />
@@ -79,88 +173,102 @@ export default function Profile() {
               <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
                 <div className="px-6">
                   <div className="flex flex-wrap justify-center">
-                    <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-                      <div className="relative">
+                    <div className="w-36 h-36 relative m-4 rounded bg-white">
                         <img
                             alt="..."
-                            src={image}
-                            className="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px"
+                            src={avatar ? avatar : user.avatar}
+                            className="w-full h-full object-cover display-block bg-white"
                         />
-                      </div>
-                    </div>
-                    <div className="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
-                      <div className="py-6 px-3 mt-32 sm:mt-0">
-                        <button
-                            className="bg-lightBlue-500 active:bg-lightBlue-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                        >
-                          Connect
-                        </button>
-                      </div>
-                    </div>
-                    <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                      <div className="flex justify-center py-4 lg:pt-4 pt-8">
-                        <div className="mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          22
+                      <span className="absolute -bottom-24 left-0 w-full h-1/2 bg-gray-200 text-center font-normal uppercase text-blueGray-800 transition ease-in-out duration-50 hover:-bottom-1">
+                          <i className="fas fa-camera"></i>
+                          <label for="file_up" className="cursor-pointer ml-1">Change</label>
+                          <input type="file" name="file" id="file_up" className="hidden" onChange={changeAvatar}/>
                         </span>
-                          <span className="text-sm text-blueGray-400">
-                          Friends
-                        </span>
-                        </div>
-                        <div className="mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          10
-                        </span>
-                          <span className="text-sm text-blueGray-400">
-                          Photos
-                        </span>
-                        </div>
-                        <div className="lg:mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          89
-                        </span>
-                          <span className="text-sm text-blueGray-400">
-                          Comments
-                        </span>
-                        </div>
-                      </div>
+
                     </div>
                   </div>
+
                   <div className="text-center mt-12">
-                    <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-                      { name || 'Jenna Stones'}
-                    </h3>
-                    <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
-                      <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>{" "}
-                      {address}
+                    <div>
+                      {err && showErrMsg(err)}
+                      {success && showSuccessMsg(success)}
+                      {loading && <h3>Loading.....</h3>}
                     </div>
-                    <div className="mb-2 text-blueGray-600 mt-10">
-                      <i className="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>
-                      Solution Manager - Creative Tim Officer
+                    <div className="my-2">
+                      <label className="block text-sm font-normal leading-normal text-blueGray-700 mb-2">Name</label>
+                      <input className="border-0 px-2 py-2 bg-white rounded text-sm shadow focus:outline-none focus:ring w-auto ease-linear transition-all duration-150 ml-2" type="text" name="name" id="name" defaultValue={user.name}
+                             placeholder="Your name" onChange={handleChange}/>
                     </div>
-                    <div className="mb-2 text-blueGray-600">
-                      <i className="fas fa-university mr-2 text-lg text-blueGray-400"></i>
-                      University of Computer Science
+                    <div className="my-2">
+                      <label className="block text-sm font-normal leading-normal mb-2 text-blueGray-700 mb-2">E-mail</label>
+                      <input className="border-0 px-2 py-2 bg-white rounded text-sm shadow focus:outline-none focus:ring w-auto ease-linear transition-all duration-150 ml-2" type="email" name="email" id="email" defaultValue={user.email}
+                            disabled  />
                     </div>
+                    <div className="my-2">
+                      <label className="block text-sm font-normal leading-normal mb-2 text-blueGray-700 mb-2">Address</label>
+                      <input className="border-0 px-2 py-2 bg-white rounded text-sm shadow focus:outline-none focus:ring w-auto ease-linear transition-all duration-150 ml-2" type="text" name="address" id="address" defaultValue={user.address}
+                               placeholder="Your Address"  onChange={handleChange}/>
+                    </div>
+                    <div className="my-2">
+                      <label className="text-sm font-normal leading-normal mb-2 text-blueGray-700 mb-2 block">Password</label>
+                      <input  className="border-0 px-2 py-2 bg-white rounded text-sm shadow focus:outline-none focus:ring w-auto ease-linear transition-all duration-150 ml-2" type="password"  name="password" id="password"
+                          value={password}   placeholder="New password"  onChange={handleChange}/>
+                    </div>
+                    <div className="my-2">
+                      <label className="text-sm block font-normal leading-normal mb-2 text-blueGray-700 mb-2">Confirm password</label>
+                      <input className="border-0 px-2 py-2 bg-white rounded text-sm shadow focus:outline-none focus:ring w-auto ease-linear transition-all duration-150 ml-2" type="password" name="cf_password" id="cf_password"
+                            value={cf_password} placeholder="Confirm password" onChange={handleChange}/>
+                    </div>
+                    <div>
+                      <em style={{color: "crimson"}}>
+                        * If you update your password here, you will not be able
+                        to login quickly using google and facebook.
+                      </em>
+                    </div>
+                    <button disabled={loading} onClick={handleUpdate}>Update</button>
+
                   </div>
                   <div className="mt-10 py-10 border-t border-blueGray-200 text-center">
                     <div className="flex flex-wrap justify-center">
                       <div className="w-full lg:w-9/12 px-4">
-                        <p className="mb-4 text-lg leading-relaxed text-blueGray-700">
-                          An artist of considerable range, Jenna the name taken by
-                          Melbourne-raised, Brooklyn-based Nick Murphy writes,
-                          performs and records all of his own music, giving it a
-                          warm, intimate feel with a solid groove structure. An
-                          artist of considerable range.
-                        </p>
-                        <a
-                            href="#pablo"
-                            className="font-normal text-lightBlue-500"
-                            onClick={(e) => e.preventDefault()}
-                        >
-                          Show more
-                        </a>
+                        <div style={{overflowX: "auto"}}>
+                          <table className="customers">
+                            <thead>
+                            <tr>
+                              <th className="ml-2">ID</th>
+                              <th className="ml-2">Name</th>
+                              <th className="ml-2">Email</th>
+                              <th className="ml-2">Admin</th>
+                              <th className="ml-2">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {
+                              users.map(user => (
+                                  <tr key={user._id}>
+                                    <td className="px-2">{user._id}</td>
+                                    <td className="px-2">{user.name}</td>
+                                    <td className="px-2">{user.email}</td>
+                                    <td className="px-2">
+                                      {
+                                        user.role === 1
+                                            ? <i className="fas fa-check cursor-pointer" title="Admin"></i>
+                                            : <i className="fas fa-times cursor-pointer" title="User"></i>
+                                      }
+                                    </td>
+                                    <td className="px-2">
+                                      <Link to={`/edit_user/${user._id}`} className="px-2">
+                                        <i className="fas fa-edit cursor-pointer" title="Edit"></i>
+                                      </Link>
+                                      <i className="fas fa-trash-alt cursor-pointer" title="Remove"
+                                         onClick={() => handleDelete(user._id)} ></i>
+                                    </td>
+                                  </tr>
+                              ))
+                            }
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
