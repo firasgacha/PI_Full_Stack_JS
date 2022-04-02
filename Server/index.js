@@ -4,19 +4,30 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
-
+var productsRouter=require('./routes/products');
+var ratingsRouter=require('./routes/ratings');
+var feedbacksRouter=require('./routes/feedbacks');
+const path = require("path");
 const app = express()
-app.use(express.json())
 app.use(cors())
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser())
-app.use(fileUpload({
-    useTempFiles: true
-}))
+// app.use(fileUpload({
+//     useTempFiles: true
+// }))
 
 // Routes
 
 app.use('/user', require('./routes/userRouter'))
 app.use('/api', require('./routes/upload'))
+app.use('/products',productsRouter);
+app.use('/ratings',ratingsRouter);
+app.use('/feedbacks',feedbacksRouter);
 
 //Connect to mongodb
 const URI = process.env.MONGODB_URL

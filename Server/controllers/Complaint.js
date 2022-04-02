@@ -7,14 +7,14 @@ module.exports = {
         try {
             Complaint.findById(req.params.id).then((complaint) => res.json(complaint));
         } catch (error) {
-            res.status(404).json({ message: error.message })
+            res.status(404).json({message: error.message})
         }
     },
-    getComplaint: (req, res, next) => {
+    getComplaint: (req, res, next) =>{
         try {
             Complaint.find().then((comp) => res.json(comp));
         } catch (error) {
-            res.status(404).json({ message: error.message });
+            res.status(404).json({message: error.message});
         }
     },
     addComplaint: (req, res) => {
@@ -24,37 +24,29 @@ module.exports = {
             newComplaint.save();
             res.status(201).json(newComplaint);
         } catch (error) {
-            res.status(400).json({ message: error.message });
+            res.status(400).json({message: error.message});
         }
     },
     updateComplaint: (req, res) => {
         const newComplaint = new Complaint(req.body);
         try {
-            Complaint.findByIdAndUpdate(req.params.id, newComplaint, {
+            Complaint.findByIdAndUpdate(req.params.id, newComplaint,{
                 useFindAndModify: false,
-            }).then((complaint) => { res.json(complaint) });
+            }).then((complaint) => {res.json(complaint)});
         } catch (error) {
-            res.status(400).json({ message: error });
+            res.status(400).json({message: error});
         }
     },
     deleteComplaint: (req, res) => {
-        const id = req.params.id;
-        Complaint.findByIdAndRemove(id)
-            .then(data => {
-                if (!data) {
-                    res.status(404).send({
-                        message: `Cannot delete Complaint with id=${id}.`
-                    });
-                } else {
-                    res.send({
-                        message: "Complaint was deleted successfully!"
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message: "Could not delete Complaint with id=" + id
-                });
+        try {
+            let id = mongoose.Types.ObjectId(req.params.id);
+            Grade.deleteMany({complaint: id}).exec(function (err, results) {
+                console.log("Complaint Removed.",results);
             });
+            Complaint.findByIdAndDelete({_id: req.params.id})
+            .then((complaint) => res.json(complaint));
+        } catch (error) {
+            res.status(400).json({message: error.message});
+        }
     }
 }

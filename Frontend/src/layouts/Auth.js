@@ -10,8 +10,10 @@ import FooterSmall from "components/Footers/FooterSmall.js";
 
 import Login from "views/auth/Login.js";
 import Register from "views/auth/Register.js";
-import ActivationEmail from "../views/auth/ActiviationEmail";
+import ForgotPassword from "../views/auth/ForgotPassword";
+import ResetPassword from "../views/auth/ResetPassword";
 export default function Auth() {
+
   return (
     <>
       <Navbar transparent />
@@ -27,6 +29,7 @@ export default function Auth() {
           <Switch>
             <Route path="/auth/login" exact component={Login} />
             <Route path="/auth/register" exact component={Register} />
+            <Route path="/auth/forgot-password" exact component={ForgotPassword} />
               <Redirect from="/auth" to="/auth/login" />
           </Switch>
           <FooterSmall absolute />

@@ -28,11 +28,11 @@ export default function Login() {
   const handleSubmit = async e => {
     e.preventDefault()
     try{
-      const res = await axios.post('http://localhost:5000/user/login', {email, password})
+      const res = await axios.post('/user/login', {email, password})
       setUser({...user, err:'', success: res.data.msg})
-      localStorage.setItem('fistLogin', true)
+      localStorage.setItem('firstLogin', true)
       dispatch(dispatchLogin())
-      history.push("/")
+      history.push("/profile")
     }catch(err){
       err.response.data.msg &&
       setUser({...user, err: err.response.data.msg, success: ''})
@@ -148,7 +148,7 @@ export default function Login() {
               </div>
               <div className="flex flex-wrap mt-6 relative">
                 <div className="w-1/2">
-                  <Link to="/forogt_password" className="text-blueGray-200">
+                  <Link to="/auth/forgot-password" className="text-blueGray-200">
                     <small>Forgot password</small>
                   </Link>
                 </div>

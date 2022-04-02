@@ -1556,6 +1556,14 @@ select {
   height: 600px;
 }
 
+.imgprod{
+  max-width: none;
+}
+
+.hprod {
+  height: 100px;
+}
+
 .text-55 {
   font-size: 55rem;
 }
@@ -2510,6 +2518,10 @@ select {
 
 .w-auto {
   width: auto;
+}
+
+.wprod {
+  width: 100px;
 }
 
 .w-1\/2 {

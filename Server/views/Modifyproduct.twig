@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/products/update" enctype="multipart/form-data" method="post">
+    <input hidden value="{{ docproduct._id }}" id="id_p" type="text" name="id_p">
+    <label>Categorie</label>
+    <input value="{{ docproduct.Categorie.name }}" id="categorie" type="text" name="categorie" required>
+    <label>Etat</label>
+    <input value="{{ docproduct.Etat }}" id="etat" type="text" name="etat" required>
+    <label>Price</label>
+    <input value="{{ docproduct.Price }}" id="price" type="number" name="price" required>
+    <input type="file" name="multi_files" accept='image/*' multiple >
+    <input type="submit" value="Save">
+</form>
+</body>
+</html>
