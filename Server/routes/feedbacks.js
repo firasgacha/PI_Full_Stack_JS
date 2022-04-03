@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {Product,Categorie,Image}=require('../models/product');
-var {User}=require("../models/user.model");
+var User=require("../models/user.model");
 var {Feedback}=require("../models/feedback");
 var feedbacksController = require("../controllers/feedbackController");
 
