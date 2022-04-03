@@ -7,6 +7,7 @@ import {queryApi} from "../../tools/queryApi";
 import AddModifyProduct from "./AddModifyProduct";
 import { browserHistory } from 'react-router';
 import i from "styled-components/macro";
+import ListFeedbacksRatingsImages from "./ListFeedbacksRatingsImages";
 
 const customStyles = {
     overlay: {
@@ -42,12 +43,23 @@ export default function CardProduct() {
         etat:"",
         multi_files:[]
     })
-    const [prodmodify, setProdModify] = useState(null);
     const [value, setValue] = useState("");
     const [type, setType] = useState("");
     const [products,err,relaod]= useApi('getjson');
     const [errors, setErrors] = useState({ visbile: false, message: "" });
     var save=[];
+
+    const handleChange = (event) => {
+        console.log(value)
+        setValue(event.target.value);
+
+    };
+
+    for (var i in products)
+        if(products[i]['Categorie']['name'].indexOf(value)!=-1 || products[i]['Etat'].indexOf(value)!=-1 ||
+            products[i]['Price'].toString().indexOf(value)!=-1)
+            save.push(products[i]);
+
     if(value=="")
         save=products;
 
@@ -72,6 +84,41 @@ export default function CardProduct() {
         setType("Add");
         setIsOpen(true);
     }
+
+    function ModalRatings(prod) {
+        setFormData({
+            categorie:prod['prod'].Categorie.name,
+            price:prod['prod'].Price,
+            etat:prod['prod'].Etat,
+            multi_files:prod['prod'].Images,
+            rate:prod['prod'].Rate
+        });
+        setType("Ratings");
+        setIsOpen(true);
+    }
+
+    function ModalFeedbacks(prod) {
+        setFormData({
+            categorie:prod['prod'].Categorie.name,
+            price:prod['prod'].Price,
+            etat:prod['prod'].Etat,
+            multi_files:prod['prod'].Images,
+            feedback:prod['prod'].Feedback
+        });
+        setType("Feedbacks");
+        setIsOpen(true);
+    }
+
+    function ModalImages(prod) {
+        setFormData({
+            categorie:prod['prod'].Categorie.name,
+            price:prod['prod'].Price,
+            etat:prod['prod'].Etat,
+            multi_files:prod['prod'].Images
+        });
+        setType("Images");
+        setIsOpen(true);
+    }
     function ModalModify(prodmodify) {
         setFormData({
             id_p:prodmodify['prodmodify']._id,
@@ -80,14 +127,11 @@ export default function CardProduct() {
             etat:prodmodify['prodmodify'].Etat,
             multi_files:prodmodify['prodmodify'].Images
         });
-        setProdModify(prodmodify)
-        console.log(prodmodify)
         setType("Modify");
         setIsOpen(true);
     }
 
     function closeModal() {
-        setProdModify(null)
         setType("");
         setIsOpen(false);
         setFormData({
@@ -102,6 +146,12 @@ export default function CardProduct() {
         goto=<AddModifyProduct type={type} formdata={formdata}/>
     if(type=="Modify")
         goto = <AddModifyProduct type={type} formdata={formdata}/>
+    if(type=="Ratings")
+        goto=<ListFeedbacksRatingsImages type={type} formdata={formdata}/>
+    if(type=="Feedbacks")
+        goto = <ListFeedbacksRatingsImages type={type} formdata={formdata}/>
+    if(type=="Images")
+        goto=<ListFeedbacksRatingsImages type={type} formdata={formdata}/>
 
 
     return (
@@ -122,6 +172,7 @@ export default function CardProduct() {
                             >
                                 Products
                             </h3>
+                            <input type="text" id="search" placeholder="Search here" onChange={(e) =>handleChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                         </div>
                     </div>
                 </div>
@@ -174,37 +225,13 @@ export default function CardProduct() {
                                 {prod.Etat}
                             </td>
                             <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <div className="flex">
-                                {
-                                    prod.Images.map((img,index) =>
-                                        <img key={index} id="taswira" src={"http://localhost:3000/images/"+img.img}
-                                             className="hprod wprod bg-white rounded-full border imgprod"/>
-                                    )}
-                                </div>
+                                <button onClick={()=>ModalImages({prod:prod})} className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" id="in3" >Images</button>
                             </td>
                             <td>
-                                <div className="select select--multiple">
-                                    <select style={{borderColor:'inherit'}} id="multi-select" multiple>
-                                {
-                                    prod.Feedback.map((feed,index) =>
-                                        <option key={index} value={feed.User}>
-                                            {feed.Comment}
-                                        </option>
-                                    )}
-                                    </select>
-                                </div>
+                                <button onClick={()=>ModalFeedbacks({prod:prod})} className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" id="in3" >Feedbacks</button>
                             </td>
                             <td>
-                                <div className="select select--multiple">
-                                    <select style={{borderColor:'inherit'}} id="multi-select" multiple>
-                                {
-                                    prod.Rate.map((rate,index) =>
-                                        <option key={index} value={rate._id}>
-                                            {"Rate: "+rate.Stars}
-                                        </option>
-                                    )}
-                                    </select>
-                                </div>
+                                <button onClick={()=>ModalRatings({prod:prod})} className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" id="in3" >Ratings</button>
                             </td>
                             <td>
                                 <button onClick={() => Delete({id_p:prod._id})} className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" id="in2" >Delete</button>
