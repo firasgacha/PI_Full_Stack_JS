@@ -1,35 +1,29 @@
 import React from "react";
 import Chart from "chart.js";
+import {useApi} from "../../hooks/useApi";
 
 export default function CardLineChart() {
+  const [products,err,relaod]= useApi('getjson');
+  var save_name=[];
+  var save_price=[];
+  for (var i in products) {
+    save_name.push(products[i]['Categorie']['name']);
+    save_price.push(products[i]['Price'])
+
+  }
   React.useEffect(() => {
     var config = {
       type: "line",
       data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-        ],
+        labels: save_name,
         datasets: [
           {
-            label: new Date().getFullYear(),
+            label: "Price Dt",
             backgroundColor: "#4c51bf",
             borderColor: "#4c51bf",
-            data: [65, 78, 66, 44, 56, 67, 75],
+            data: save_price,
             fill: false,
-          },
-          {
-            label: new Date().getFullYear() - 1,
-            fill: false,
-            backgroundColor: "#fff",
-            borderColor: "#fff",
-            data: [40, 68, 86, 74, 56, 60, 87],
-          },
+          }
         ],
       },
       options: {
@@ -64,7 +58,7 @@ export default function CardLineChart() {
               display: true,
               scaleLabel: {
                 display: false,
-                labelString: "Month",
+                labelString: "Name",
                 fontColor: "white",
               },
               gridLines: {
@@ -86,7 +80,7 @@ export default function CardLineChart() {
               display: true,
               scaleLabel: {
                 display: false,
-                labelString: "Value",
+                labelString: "Price",
                 fontColor: "white",
               },
               gridLines: {
@@ -105,7 +99,7 @@ export default function CardLineChart() {
     };
     var ctx = document.getElementById("line-chart").getContext("2d");
     window.myLine = new Chart(ctx, config);
-  }, []);
+  }, [products]);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-blueGray-700">
