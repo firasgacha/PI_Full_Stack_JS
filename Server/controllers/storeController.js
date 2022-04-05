@@ -21,7 +21,9 @@ module.exports = {
 	},
 	getOneStore: (req, res) => {
 		try {
-			Store.findById(req.params.id).then((store) => res.json(store));
+			Store.findById(req.params.id)
+				.then((store) => res.json(store))
+				.catch((error) => res.json(null));
 		} catch (error) {
 			res.status(404).json({ message: error.message });
 		}
@@ -32,7 +34,7 @@ module.exports = {
 			await Store.find({ owner: store.owner })
 				.count()
 				.then((count) => {
-					count_name = count;
+					count_owner = count;
 				});
 			await Store.find({ fullName: store.fullName })
 				.count()
@@ -40,10 +42,10 @@ module.exports = {
 					count_name = count;
 				});
 
-			if (count_name > 2) {
+			if (count_owner > 1) {
 				res.status(400).json({ message: "Maximum Stores by User Reached" });
 			}
-			if (count > 0) {
+			if (count_name > 0) {
 				res.status(400).json({ message: "Store name already exists" });
 			}
 			const newStore = new Store(store);
@@ -57,7 +59,7 @@ module.exports = {
 		const newStore = new Store(req.body);
 		try {
 			Store.findByIdAndUpdate(req.params.id, newStore, {
-				useFindAndModify: false,
+				useFindAndModify: true,
 			}).then((store) => {
 				res.json(store);
 			});
