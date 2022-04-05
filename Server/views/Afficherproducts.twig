@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style type="text/css">
+    #taswira{
+        float: left;
+        margin: 5px;
+        width:180px;
+        height: 200px;
+    }
+    </style>
+<table>
+    <tr>
+        <td>id</td>
+        <td>Store</td>
+        <td>Categorie</td>
+        <td>Price</td>
+        <td>Etat</td>
+        <td>Images</td>
+        <td>Feedbacks</td>
+        <td>Ratings</td>
+        <td>supprimer</td>
+        <td>modifier</td>
+    </tr>
+    {% for prod in d_product %}
+        <tr>
+            <td>
+                {{prod._id}}
+            </td>
+            <td>
+                {{prod.Store }}
+            </td>
+            <td>
+                {{prod.Categorie.name}}
+            </td>
+            <td>
+                {{prod.Price}}
+            </td>
+            <td>
+                {{prod.Etat}}
+            </td>
+            <td>
+                {% for im in prod.Images %}
+                <img id="taswira" src="/images/{{im['img']}}">
+                {% endfor %}
+             </td>
+            <td>
+                {% for feed in prod.Feedback %}
+                {{ feed|nl2br }}
+                {% endfor %}
+            </td>
+            <td>
+                {% for rate in prod.Rate %}
+                    {{ rate|nl2br }}
+                {% endfor %}
+            </td>
+            <td> <form  action="/products/delete" method="post" >
+                    <input id="in1" hidden type="text" value="{{ prod._id}}" name="id_p" >
+                    <button id="in2" type="submit" class="btn btn-dark" >Supprimer</button>
+                </form></td>
+            <td> <form  action="/products/" method="post" >
+                    <input id="in1" hidden type="text" value="{{ prod._id}}" name="id_p" >
+                    <button id="in2" type="submit" class="btn btn-dark" >Modifier</button>
+                </form></td>
+
+        </tr>
+    {% endfor %}
+
+</table>
+
+<form action="/products/" method="post">
+    <button id="in3" type="submit" class="btn btn-dark" >Add</button>
+</form>
+</body>
+</html>
