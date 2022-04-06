@@ -22,6 +22,8 @@ import Index from "./views/Index.js";
 import ResetPassword from "./views/auth/ResetPassword";
 import EditUser from "./views/EditUser";
 import SendComplaint from "./views/complaint/SendComplaint";
+import Store from "./views/Store";
+import MyStores from "./views/MyStores";
 
 function App() {
 	const dispatch = useDispatch();
@@ -71,6 +73,8 @@ function App() {
 						component={ActivationEmail}
 					/>
 					<Route path="/landing" exact component={Landing} />
+					<Route path="/store/:id" exact component={Store} />
+					<Route path="/user-stores/:id" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
 					<Route path="/" exact component={Index} />
 					{/* add redirect for first page */}
