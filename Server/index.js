@@ -30,6 +30,7 @@ app.use("/products", productsRouter);
 app.use("/ratings", ratingsRouter);
 app.use("/feedbacks", feedbacksRouter);
 app.use("/complaint", Complaint);
+app.use("/store", require("./routes/store.router"));
 
 //Connect to mongodb
 const URI = process.env.MONGODB_URL;

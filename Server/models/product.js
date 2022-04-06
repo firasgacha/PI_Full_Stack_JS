@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 const { Schema, models } = require("mongoose");
-var { Store, Storeschema } = require("./store");
+var { Store, Storeschema } = require("./store.model");
 const { Rateschema } = require("./rate");
 const { Feedbackschema } = require("./feedback");
 
