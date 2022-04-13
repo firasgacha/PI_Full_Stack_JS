@@ -12,8 +12,11 @@ const Complaint = new mongoose.Schema(
 			{
 				from: { type: String },
 				content: { type: String },
+				timestamp: {
+					type: Date,
+					default: Date.now,
+				},
 			},
-			{ timestamps: true },
 		],
 	},
 	{ timestamps: true }

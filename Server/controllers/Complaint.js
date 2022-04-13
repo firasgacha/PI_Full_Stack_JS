@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Complaint = require("../models/complaint.model");
 
 module.exports = {
-	getComplaintByUserId: (req, res) => {
+	getComplaintByUserId: async(req, res) => {
 		const { id } = req.params;
 		Complaint.find({ userId: id })
 			.then((data) => {
@@ -16,7 +16,7 @@ module.exports = {
 				res.status(500).send({ message: err.message });
 			});
 	},
-	getOneComplaint: (req, res) => {
+	getOneComplaint: async(req, res) => {
 		try {
 			Complaint.findById(req.params.id).then((data) =>
 				res.json({
@@ -29,7 +29,7 @@ module.exports = {
 			res.status(404).json({ message: error.message });
 		}
 	},
-	getComplaint: (req, res, next) => {
+	getComplaint: async(req, res, next) => {
 		try {
 			Complaint.find().then((data) =>
 				res.json({
@@ -42,7 +42,7 @@ module.exports = {
 			res.status(404).json({ message: error.message });
 		}
 	},
-	addComplaint: (req, res) => {
+	addComplaint: async(req, res) => {
 		const Comp = req.body;
 		const newComplaint = new Complaint(Comp);
 		try {
@@ -56,34 +56,9 @@ module.exports = {
 			res.status(400).json({ message: error.message });
 		}
 	},
-	// addComplaint: async (req, res) => {
-	//     const  {type, description, imgName ,email, userId} = req.body;
-	//     const newComplaint = await new Complaint({type, description, imgName ,email, userId});
-	//     try {
-	//         await newComplaint.save();
-	//         res.status(201).json({
-	//             status: "SUCCESS",
-	//             message: "Complaint Sended", newComplaint
-	//         });
-	//     } catch (error) {
-	//         res.status(400).json({ message: error.message });
-	//     }
-	// },
-
-	// const createProduct = async(req, res) => {
-	//     console.log(`create prod in server ${req}`);
-
-	//     const { productName, description, categoryId, price, size, stockQuantity , image, arModel, threeDModel,rating,promo,color } = req.body;
-	//     const newProduct = await new Product({productName, description, categoryId, price, size, stockQuantity , image, arModel, threeDModel,rating,promo,color});
-	//     try {
-	//         await newProduct.save();
-	//         res.status(201).json(newProduct);
-	//     } catch (error) {
-	//         res.status(409).send({message: error.message});
-
-	//     }
-	// }
-	updateComplaint: (req, res) => {
+	
+	
+	updateComplaint: async(req, res) => {
 		const newComplaint = new Complaint(req.body);
 		try {
 			Complaint.findByIdAndUpdate(req.params.id, newComplaint, {
@@ -95,7 +70,37 @@ module.exports = {
 			res.status(400).json({ message: error });
 		}
 	},
-	deleteComplaint: (req, res) => {
+
+	updateComplaintStatus : async (req, res) => {
+		try {
+			const {status} = req.body;
+			await Complaint.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ status },
+			);
+			res.json({
+				status: "SUCCESS",
+				message:"updated successfully"
+			})
+		} catch (error) {
+			res.status(400).json({ message: error.message });
+		}
+	},
+	sendMsgComplaint : async (req, res) => {
+		try {
+			const {from,content} = req.body;
+			await Complaint.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ $push: { msgs: { from, content } } },)
+				res.json({
+					status: "SUCCESS",
+					message:"Msg sended successfully"
+				})
+			} catch (error) {
+			res.status(400).json({ message: error.message });
+		}
+	},
+	deleteComplaint: async(req, res) => {
 		const id = req.params.id;
 		Complaint.findByIdAndRemove(id)
 			.then((data) => {
