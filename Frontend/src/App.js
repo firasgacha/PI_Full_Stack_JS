@@ -22,8 +22,10 @@ import Index from "./views/Index.js";
 import ResetPassword from "./views/auth/ResetPassword";
 import EditUser from "./views/EditUser";
 import SendComplaint from "./views/complaint/SendComplaint";
+import MyComplaints from "./views/complaint/MyComplaints";
 import Store from "./views/Store";
 import MyStores from "./views/MyStores";
+import SendMessage from "./views/messages/SendMessage";
 
 function App() {
 	const dispatch = useDispatch();
@@ -65,6 +67,8 @@ function App() {
 					<Route path="/auth" component={isLogged ? Index : Auth} />
 					{/* add routes without layouts */}
 					<Route path="/complaint" exact component={SendComplaint} />
+					<Route path="/message" exact component={SendMessage} />
+					<Route path="/mycomplaints" exact component={MyComplaints} />
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/user/reset/:token" exact component={ResetPassword} />
 					<Route

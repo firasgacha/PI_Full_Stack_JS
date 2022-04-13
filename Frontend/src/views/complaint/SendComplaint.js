@@ -2,13 +2,10 @@ import React, { useState, useEffect} from 'react';
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
 import * as api from '../../api/Api';
-import jwt from "jsonwebtoken";
 import axios from "axios";
 import { Image } from 'cloudinary-react';
 import Alert from '../../components/Alert/Alert';
 import {fetchUser,dispatchGetUser} from '../../redux/actions/authAction';
-
-import {fetchAllUsers,dispatchGetAllUsers} from "../../redux/actions/userActions";
 import {useDispatch, useSelector} from "react-redux";
 
 export default function SendComplaint () {

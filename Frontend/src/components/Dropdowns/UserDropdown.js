@@ -68,13 +68,12 @@ const UserDropdown = () => {
           Action
         </a>
         <a
-          href="#pablo"
           className={
             "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
           }
           onClick={(e) => e.preventDefault()}
         >
-          Another action
+          <Link to="/mycomplaints">My Complaints</Link>
         </a>
         <a
           className={

@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from "react";
-import jwt from "jsonwebtoken";
 import * as api from '../../api/Api';
+import { fetchUser, dispatchGetUser } from '../../redux/actions/authAction';
+import { useDispatch, useSelector } from "react-redux";
+import Navbar from "components/Navbars/AuthNavbar.js";
+import ModalChat from "../../components/Modal/ModalChat";
+import ModalImage from "../../components/Modal/ModalImage";
+import Button from '@mui/material/Button';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Channel from "./Channel"
 
 
 
-export const Tabs = () => {
+
+export default function MyComplaints() {
+  const color = "light";
   const [openTab, setOpenTab] = React.useState(1);
-  const [userId, setUser] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
   const [Data, setData] = useState([]);
 
 
-  async function getUser() {
-    const req = await fetch('http://localhost:1337/api/user', {
-      headers: {
-        'x-access-token': localStorage.getItem('token')
-      }
-    });
-    const data = await req.json();
-    if (data.status === 'ok') {
-      setUser(data.id);
-      console.log(userId);
-    } else {
-      alert(data.error);
-      window.location.href = '/auth';
-    }
-  }
-  const getComplaintsByUser = () => {
-    api.getComplaintByUserId(userId)
+  const auth = useSelector(state => state.auth)
+  const token = useSelector(state => state.token)
+  const [connected, setConnceted] = useState(false);
+  const { user, isAdmin } = auth
+  const [callback, setCallback] = useState(false)
+  const dispatch = useDispatch()
+
+  const getComplaintsByUser = async () => {
+    await api.getComplaintByUserId(userId)
       .then(response => {
         const result = response.data;
         const { status, message, data } = result;
@@ -41,27 +43,20 @@ export const Tabs = () => {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
     if (token) {
-      const user = jwt.decode(token)
-      if (!user) {
-        localStorage.removeItem('token');
-      } else {
-        getUser();
-      }
+      fetchUser(token).then(res => {
+        dispatch(dispatchGetUser(res))
+        setUserId(res.data._id)
+        setUserName(res.data.name)
+        setConnceted(true)
+        getComplaintsByUser();
+      })
     }
-  }, []);
+  }, [token, isAdmin, dispatch, callback, userId])
 
-  useEffect(() => {
-    getComplaintsByUser();
-  } , [userId]);
   return (
     <>
-       {/* <Navbar transparent /> */}
-       <br />
-       <br />
-      <button onClick={getComplaintsByUser}>Refresh</button>
-      <br />
+      {/* <Navbar transparent /> */}
       <div className="flex flex-wrap">
         <div className="w-full">
           <ul
@@ -130,30 +125,97 @@ export const Tabs = () => {
             <div className="px-4 py-5 flex-auto">
               <div className="tab-content tab-space">
                 <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                  <p>
-                    {Data.map((item) =>
-                      <tr key={item.id}>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          {item.type}
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-emerald-500 mr-2"></i>
-                          {item.status}
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          {item.createdAt}
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          {item.description}
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                          <button className="text-lightBlue-500 bg-transparent border border-solid border-lightBlue-500 hover:bg-lightBlue-500 hover:text-white active:bg-lightBlue-600 font-bold uppercase text-sm px-6 py-3  rounded-full outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">
-                          <i class="fas fa-comments"></i> Conversation
-                          </button>
-                        </td>
+                  <Button variant="outlined" startIcon={<RefreshIcon />} onClick={getComplaintsByUser}>
+                    Refresh
+                  </Button>
+                  <table className="items-center w-full bg-transparent border-collapse">
+                    <thead>
+                      <tr>
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        >
+                          Problem Type
+                        </th>
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        >
+                          Status
+                        </th>
+
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        >
+                          Date
+                        </th>
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        >
+                          Description
+                        </th>
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        ></th>
+                        <th
+                          className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                            (color === "light"
+                              ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                              : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                          }
+                        ></th>
                       </tr>
-                    )}
-                  </p>
+                    </thead>
+                    <tbody>
+                      {Data.map((item) =>
+                        <tr key={item.id}>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {item.type}
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <i className="fas fa-circle text-emerald-500 mr-2"></i>{" "}
+                            {item.status}
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {item.createdAt.toString().substring(0, 10)}
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {item.description}
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <ModalChat userName={userName} complId={item._id} msgs={item.msgs} />
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
+                            <ModalImage image={item.image} />
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
                 <div className={openTab === 2 ? "block" : "hidden"} id="link2">
                   <p>
