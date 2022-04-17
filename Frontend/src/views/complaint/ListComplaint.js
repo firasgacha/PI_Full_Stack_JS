@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import * as api from '../../api/Api';
-import axios from 'axios';
 import {Image} from 'cloudinary-react';
 
 export default function GetComplaintsData () {
     const color = "light";
     const [Data, setData] = useState([]);
+    const [etat, setEtat] = useState('');
 
     // Get All Complaints Data
     const GetComplaintsData = () => {
@@ -22,6 +22,23 @@ export default function GetComplaintsData () {
                   console.log(result);
               }
       }) .catch(err => {console.log(err)})
+    }
+    const ChangeStatus = async(id,e) => {
+      if (e==='Open'){setEtat('Closed')}else {setEtat('Open')}
+      api.updateComplaintStatus(id,
+        {
+          status: etat
+        }
+        ).then(response => {
+        const result = response.data;
+        const { status, message, data } = result;
+            if (status !== 'SUCCESS') {
+                alert(message, status)
+            }
+            else {
+                console.log(result);
+            }
+      }) .catch(err => {console.log(err.message)})
     }
    
     useEffect(() => {
@@ -50,6 +67,8 @@ export default function GetComplaintsData () {
                 </div>
               </div>
             </div>
+            
+          
             <div className="block w-full overflow-x-auto">
               {/* Projects table */}
               <table className="items-center w-full bg-transparent border-collapse">
@@ -118,7 +137,7 @@ export default function GetComplaintsData () {
                 </thead>
                 <tbody>
                   {Data.map((item) => 
-                  <tr key={item.id}>
+                  <tr key={item._id}>                    
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">                      
                     <Image cloudName="du8mkgw6r" publicId={item.image} />
                     </th>
@@ -128,6 +147,7 @@ export default function GetComplaintsData () {
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       <i className="fas fa-circle text-emerald-500 mr-2"></i>{" "}
                       {item.status}
+                      <button onClick={() => ChangeStatus(item._id,item.status)}>ccccc</button>
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       {item.createdAt}

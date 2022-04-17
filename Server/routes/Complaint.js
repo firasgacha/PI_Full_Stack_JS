@@ -8,8 +8,14 @@ const {
 	updateComplaint,
 	deleteComplaint,
 	getComplaintByUserId,
+	updateComplaintStatus,
+	sendMsgComplaint
 } = require("../controllers/Complaint.js");
 
+//send messages
+router.patch("/send_msg/:id",sendMsgComplaint);
+//Update status
+router.patch('/update_status/:id', updateComplaintStatus);
 //DONE ADD
 router.post("/addComplaint", addComplaint);
 //DONE UPDATE SHOULD enter the id filed
