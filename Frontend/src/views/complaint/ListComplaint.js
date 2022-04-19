@@ -23,11 +23,10 @@ export default function GetComplaintsData () {
               }
       }) .catch(err => {console.log(err)})
     }
-    const ChangeStatus = async(id,e) => {
-      if (e==='Open'){setEtat('Closed')}else {setEtat('Open')}
+    const ChangeStatus = (id,e) => {
       api.updateComplaintStatus(id,
         {
-          status: etat
+          status: e === 'Open' ? 'Closed' : 'Open'
         }
         ).then(response => {
         const result = response.data;
@@ -36,6 +35,8 @@ export default function GetComplaintsData () {
                 alert(message, status)
             }
             else {
+                GetComplaintsData();
+
                 console.log(result);
             }
       }) .catch(err => {console.log(err.message)})
