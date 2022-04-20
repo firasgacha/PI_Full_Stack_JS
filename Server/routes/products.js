@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {Product,Categorie,Image}=require('../models/product');
-var {Store}=require("../models/store");
+var {Store}=require("../models/store.model");
 var {User}=require("../models/user.model");
 var {Rate}=require("../models/rate");
 var {Feedback}=require("../models/feedback");
@@ -35,26 +35,36 @@ router.post('/', async function (req, res)  {
 });
 
 router.post('/add',  upload.array('multi_files'), async function (req, res) {
-    var cat=new Categorie(
-        {
-            name:req.body.categorie
-        }
-    );
-    var prod= new Product(
-        {
-            Price:req.body.price,
-            Categorie:cat,
-            Etat:req.body.etat
-        }
+    try {
 
-    );
-    for(var file in req.files)
-        prod.Images.push(new Image({ img:req.files[file]['filename']}));
-    prod.save();
-    res.redirect('/products/get');
+        var cat=new Categorie(
+            {
+                name:req.body.categorie
+            }
+        );
+        var store=new Store({
+            fullName:Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
+        })
+        var prod= new Product(
+            {
+                Price:req.body.price,
+                Categorie:cat,
+                Etat:req.body.etat,
+                Store:store
+            }
+
+        );
+        for(var file in req.files)
+            prod.Images.push(new Image({ img:req.files[file]['filename']}));
+        prod.save();
+    res.json({msg: "Added!"})
+}catch(err){
+    return res.status(500).json({msg: err.message})
+}
 });
 
 router.post('/update', upload.array('multi_files'), async function (req, res) {
+   try {
     var cat=new Categorie(
         {
             name:req.body.categorie
@@ -73,13 +83,19 @@ router.post('/update', upload.array('multi_files'), async function (req, res) {
             docproduct.Images.push(new Image({img: req.files[file]['filename']}));
     }
     await docproduct.save();
-    res.redirect('/products/get');
+    res.json({msg: "Updated!"})
+}catch(err){
+    return res.status(500).json({msg: err.message})
+}
 });
 
 router.post('/delete', async function (req, res) {
-    console.log(req.body)
+    try {
         await Product.findByIdAndDelete(req.body.id_p).exec();
-        res.redirect('/products/get');
+        res.json({msg: "Deleted!"})
+    }catch(err){
+        return res.status(500).json({msg: err.message})
+    }
 });
 
 router.get('/get',prodcutsController.getproducts );

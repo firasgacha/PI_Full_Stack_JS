@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 import {useApi} from "../../hooks/useApi";
 import useScript from "../../hooks/useScripts";
@@ -8,6 +8,7 @@ import AddModifyProduct from "./AddModifyProduct";
 import { browserHistory } from 'react-router';
 import i from "styled-components/macro";
 import ListFeedbacksRatingsImages from "./ListFeedbacksRatingsImages";
+import {Alert} from "@mui/material";
 
 const customStyles = {
     overlay: {
@@ -45,26 +46,82 @@ export default function CardProduct() {
     })
     const [value, setValue] = useState("");
     const [type, setType] = useState("");
-    const [products,err,relaod]= useApi('getjson');
+    let [products,err,relaod]= useApi('getjson');
+    const [productstimer,errtimer,relaodtimer]= useApi('getjson');
     const [errors, setErrors] = useState({ visbile: false, message: "" });
+    const [show, setShow] = useState(false);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+    let goto;
     var save=[];
+    let check_add=false;
+    let check_del=false;
+    let msg;
 
+    useEffect(() => {
+        const interval = setInterval(relaodtimer, 1000);
+        return () => {
+            clearInterval(interval);}
+    }, []);
     const handleChange = (event) => {
         console.log(value)
         setValue(event.target.value);
 
     };
 
-    for (var i in products)
-        if(products[i]['Categorie']['name'].indexOf(value)!=-1 || products[i]['Etat'].indexOf(value)!=-1 ||
-            products[i]['Price'].toString().indexOf(value)!=-1)
-            save.push(products[i]);
+    console.log("*******************Product*******************")
+    // console.log(products)
+    console.log("*******************Product Timer*******************")
+    // console.log(productstimer)
+
+    for (var a in productstimer) {
+        for (var b in products) {
+            for (var c in productstimer) {
+                if (products[b]['_id'] == productstimer[c]['_id']) {
+                    check_del = true
+
+                }
+            }
+            if (!check_del)
+                products.splice(products[a], 1)
+            check_del = false;
+        }
+    }
+        for (var i in productstimer) {
+            for (var j in products) {
+                if (productstimer[i]['_id'] == products[j]['_id']) {
+                    if (products[j]['Categorie']['name'] != productstimer[i]['Categorie']['name'])
+                        products[j]['Categorie']['name'] = productstimer[i]['Categorie']['name']
+                    if (products[j]['Etat'] != productstimer[i]['Etat'])
+                        products[j]['Etat'] = productstimer[i]['Etat']
+                    if (products[j]['Price'].toString() != productstimer[i]['Price'].toString())
+                        products[j]['Price'] = productstimer[i]['Price']
+                    if (!(JSON.stringify(products[j]['Feedback']) === JSON.stringify(productstimer[i]['Feedback'])))
+                        products[j]['Feedback'] = productstimer[i]['Feedback']
+                    if (!(JSON.stringify(products[j]['Rate']) === JSON.stringify(productstimer[i]['Rate'])))
+                        products[j]['Rate'] = productstimer[i]['Rate']
+                    if (!(JSON.stringify(products[j]['Images']) === JSON.stringify(productstimer[i]['Images'])))
+                        products[j]['Images'] = productstimer[i]['Images']
+                    check_add = true;
+                }
+            }
+            if (!check_add)
+                products.push(productstimer[i])
+
+            check_add = false;
+        }
+
+    for (var k in products)
+        if(products[k]['Categorie']['name'].indexOf(value)!=-1 || products[k]['Etat'].indexOf(value)!=-1 ||
+            products[k]['Price'].toString().indexOf(value)!=-1)
+            save.push(products[k]);
 
     if(value=="")
         save=products;
 
-    const [modalIsOpen, setIsOpen] = React.useState(false);
-
+    if(show)
+        msg=<Alert severity="error" onClose={() => setShow(false)} >
+            Oops! Product sold out and no more available.
+        </Alert>
     async function Delete(id) {
         if (window.confirm("Are you sure ?")) {
             const [, err] = await queryApi("delete", id, "POST", false);
@@ -74,8 +131,9 @@ export default function CardProduct() {
                     message: JSON.stringify(err.errors, null, 2),
                 });
             }
-            else
-                window.location.reload(false);
+            setShow(true)
+            setTimeout(()=>setShow(false),3000);
+
         }
 
     }
@@ -119,6 +177,7 @@ export default function CardProduct() {
         setType("Images");
         setIsOpen(true);
     }
+
     function ModalModify(prodmodify) {
         setFormData({
             id_p:prodmodify['prodmodify']._id,
@@ -141,7 +200,7 @@ export default function CardProduct() {
             multi_files:[]
         });
     }
-    let goto;
+
     if(type=="Add")
         goto=<AddModifyProduct type={type} formdata={formdata}/>
     if(type=="Modify")
@@ -258,6 +317,7 @@ export default function CardProduct() {
                         </div>
                     </Modal>
                 </div>
+                {msg}
             </div>
         </>
 

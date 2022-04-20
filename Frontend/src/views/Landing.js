@@ -1,12 +1,28 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Link } from "react-router-dom";
 
 // components
 
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
+import {useDispatch, useSelector} from "react-redux";
+import {dispatchGetAllUsers, fetchAllUsers} from "../redux/actions/userActions";
 
 export default function Landing() {
+  const auth = useSelector(state => state.auth)
+  const users = useSelector(state => state.users)
+  const token = useSelector(state => state.token)
+  const {user , isLogged} = auth
+  const dispatch = useDispatch()
+  useEffect(() => {
+    if(isLogged) {
+      fetchAllUsers(token).then(res => {
+        dispatch(dispatchGetAllUsers(res))
+      })
+    }
+  },[dispatch,isLogged])
+
+  console.log(users);
   return (
     <>
       <Navbar transparent />
