@@ -5,6 +5,7 @@ import ModalImage from 'components/Modal/ModalImage';
 import ModalChat from 'components/Modal/ModalChat';
 import { fetchUser, dispatchGetUser } from '../../redux/actions/authAction';
 import { useDispatch, useSelector } from "react-redux";
+import { Button } from '@mui/material';
 
 export default function GetComplaintsData () {
     const color = "light";
