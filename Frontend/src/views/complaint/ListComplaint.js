@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import * as api from '../../api/Api';
-import {Image} from 'cloudinary-react';
+import ModalImage from 'components/Modal/ModalImage';
+import ModalChat from 'components/Modal/ModalChat';
+import { fetchUser, dispatchGetUser } from '../../redux/actions/authAction';
+import { useDispatch, useSelector } from "react-redux";
 
 export default function GetComplaintsData () {
     const color = "light";
     const [Data, setData] = useState([]);
-    const [etat, setEtat] = useState('');
+    const [userId, setUserId] = useState("");
+    const [userName, setUserName] = useState("");
+    const auth = useSelector(state => state.auth)
+    const token = useSelector(state => state.token)
+    const [connected, setConnceted] = useState(false);
+    const { user, isAdmin } = auth
+    const [callback, setCallback] = useState(false)
+    const dispatch = useDispatch()
 
     // Get All Complaints Data
     const GetComplaintsData = () => {
@@ -42,10 +52,20 @@ export default function GetComplaintsData () {
       }) .catch(err => {console.log(err.message)})
     }
    
+   
     useEffect(() => {
       GetComplaintsData();
     },[]);
-    
+    useEffect(() => {
+      if (token) {
+        fetchUser(token).then(res => {
+          dispatch(dispatchGetUser(res))
+          setUserId(res.data._id)
+          setUserName(res.data.name)
+          setConnceted(true)
+        })
+      }
+    }, [token, isAdmin, dispatch, callback, userId])
     return (
         <>
           <div
@@ -75,16 +95,6 @@ export default function GetComplaintsData () {
               <table className="items-center w-full bg-transparent border-collapse">
                 <thead>
                   <tr>
-                  <th
-                      className={
-                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                        (color === "light"
-                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                          : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                      }
-                    >
-                      User
-                    </th>
                     <th
                       className={
                         "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
@@ -124,7 +134,17 @@ export default function GetComplaintsData () {
                           : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                       }
                     >
-                      Description
+                      ScreenShots
+                    </th>
+                    <th
+                      className={
+                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                        (color === "light"
+                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                          : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                      }
+                    >
+                      Chat
                     </th>
                     <th
                       className={
@@ -139,26 +159,28 @@ export default function GetComplaintsData () {
                 <tbody>
                   {Data.map((item) => 
                   <tr key={item._id}>                    
-                    <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">                      
-                    <Image cloudName="du8mkgw6r" publicId={item.image} />
-                    </th>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                       {item.type}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      <i className="fas fa-circle text-emerald-500 mr-2"></i>{" "}
+                      {item.status ==='Open'  ? <i className="fas fa-circle text-emerald-500 mr-2"></i> : <i className="fas fa-circle text-red-500 mr-2"></i> }
                       {item.status}
                       <button onClick={() => ChangeStatus(item._id,item.status)}>ccccc</button>
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      {item.createdAt}
+                      {item.createdAt.toString().substring(0, 10)}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      {item.description}
-                    </td>
+                      <ModalImage image={item.image}/>        
+                      </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                      <TableDropdown />
+                    {/* <ModalChat userName={userName} complId={item._id} msgs={item.msgs} refresh={getComplaintsByUser} /> */}
+
+                      <ModalChat userName={userName} complId={item._id} msgs={item.msgs} refresh={GetComplaintsData} />
                     </td>
+                    <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">                      
+                    <TableDropdown />
+                    </th>
                   </tr>
                   )}
                   </tbody>

@@ -33,7 +33,7 @@ export default function ModalChat(props) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <ChatBox userName={props.userName} complId={props.complId} msgs={props.msgs} close={handleClose}/>
+          <ChatBox refresh={props.refresh} userName={props.userName} complId={props.complId} msgs={props.msgs} close={handleClose}/>
         </Box>
       </Modal>
     </div>

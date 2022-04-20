@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useEffect, useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Paper } from "@material-ui/core";
 import { MessageLeft, MessageRight } from "./Message";
@@ -8,6 +8,8 @@ import * as api from '../../api/Api';
 import SendIcon from '@mui/icons-material/Send';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { fetchUser, dispatchGetUser } from '../../redux/actions/authAction';
+import { useDispatch, useSelector } from "react-redux";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,13 +45,13 @@ const useStyles = makeStyles((theme: Theme) =>
             overflowY: "scroll",
             height: "calc( 100% - 80px )"
         },
-        wrapForm : {
+        wrapForm: {
             display: "flex",
             justifyContent: "center",
             width: "95%",
             margin: `${theme.spacing(0)} auto`
         },
-        wrapText  : {
+        wrapText: {
             width: "100%"
         },
         button: {
@@ -60,58 +62,101 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ChatBox(props) {
     const classes = useStyles();
-    const [msg, setMsg] = useState();
+    const [msg, setMsg] = useState('');
     const complId = props.complId;
     const userName = props.userName;
+    const [role, setRole] = useState("");
+    const auth = useSelector(state => state.auth)
+    const token = useSelector(state => state.token)
+    const [connected, setConnceted] = useState(false);
+    const { user, isAdmin } = auth;
+    const [callback, setCallback] = useState(false);
+    const dispatch = useDispatch();
+
+
     const sendMsg = async () => {
         await api.sendMessage(complId,
-          {
-            from: userName,
-            content: msg
+            {
+                from: role,
+                content: msg,
+            })
+            .then(response => {
+                const result = response.data;
+                const { status, message, data } = result;
+                if (status !== 'SUCCESS') {
+                    alert(message, status)
+                }
+                else {
+                    console.log(result);
+                }
+            }).catch(err => { console.log(err.message) })
+    }
+    useEffect(() => {
+        if (token) {
+          fetchUser(token).then(res => {
+            dispatch(dispatchGetUser(res))
+            setRole(res.data.role)
+            setConnceted(true)
           })
-          .then(response => {
-            const result = response.data;
-            const { status, message, data } = result;
-            if (status !== 'SUCCESS') {
-              alert(message, status)
-            }
-            else {
-              console.log(result);
-            }
-          }).catch(err => { console.log(err.message) })
-      }
+        }
+      }, [token, isAdmin, dispatch, callback])
     return (
+
         <div className={classes.container}>
             <Paper className={classes.paper} zDepth={2}>
-                <Fab size="medium" color="primary" aria-label="add" onClick={props.close}>
+                <Fab size="medium" color="primary" aria-label="add" onClick={() => {
+                    props.refresh();
+                    props.close();
+                }}>
                     <CloseIcon />
                 </Fab>
                 <Paper id="style-1" className={classes.messagesBody}>
-                    {props.msgs.map((msg) =>
-                        <div key={msg.id}>
-                            <MessageLeft
-                                message={msg.content}
-                                timestamp={msg.timestamp}
-                                photoURL="https://lh3.googleusercontent.com/a-/AOh14Gi4vkKYlfrbJ0QLJTg_DLjcYyyK7fYoWRpz2r4s=s96-c"
-                                displayName={msg.from}
-                                avatarDisp={true}
-                            />
-                            {msg.createdAt}
+                        <div>
+                            {props.msgs.map((msg) =>
+                                <div key={msg.id}>
+                                    {msg.from == "1" ?
+                                <div>
+                                <MessageRight
+
+                                    message={msg.content}
+                                    // timestamp={msg.timestamp}
+                                    photoURL="https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
+                                    // displayName="Admin"
+                                    avatarDisp={true}
+                                />
+                                {/* {msg.createdAt} */}
+                                </div>
+                                : <div>
+                                <MessageLeft
+
+                                    message={msg.content}
+                                    // timestamp={msg.timestamp}
+                                    photoURL="https://www.gpao.fr/wp-content/uploads/2020/03/62681-flat-icons-face-computer-design-avatar-icon.png"
+                                    // displayName="User"
+                                    avatarDisp={true}
+                                />
+                                {/* {msg.createdAt} */}
+                                </div>    
+                                }
+                                </div>
+                            )}
                         </div>
-                    )}
                 </Paper>
-                <form className={classes.wrapForm}  noValidate autoComplete="off">
-            <TextField
-                id="standard-text"
-                label="Enter your message"
-                className={classes.wrapText}
-                //margin="normal"
-                onChange={(e) => setMsg(e.target.value)}
-            />
-            <Button onClick={sendMsg} variant="contained" color="primary" className={classes.button}>
-                <SendIcon />
-            </Button>
-            </form>
+                <form className={classes.wrapForm} noValidate autoComplete="off">
+                    <TextField
+                        id="standard-text"
+                        label="Enter your message"
+                        className={classes.wrapText}
+                        //margin="normal"
+                        onChange={(e) => setMsg(e.target.value)}
+                    />
+                    <Button type='reset' variant="contained" color="primary" className={classes.button}onClick={() => {
+                    sendMsg();
+                    props.refresh();
+                }}>
+                        <SendIcon />
+                    </Button>
+                </form>
             </Paper>
         </div>
     );

@@ -10,6 +10,7 @@ const Complaint = new mongoose.Schema(
 		userId: { type: String, required: false },
 		msgs: [
 			{
+				// role: {type: String},
 				from: { type: String },
 				content: { type: String },
 				timestamp: {
