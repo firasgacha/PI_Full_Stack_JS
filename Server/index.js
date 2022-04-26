@@ -10,10 +10,10 @@ var ratingsRouter = require("./routes/ratings");
 var feedbacksRouter = require("./routes/feedbacks");
 const http = require("http");
 const path = require("path");
-const server = express();
-const app = http.createServer(server);
+const app = express();
+const server = http.createServer(app);
 const socketio = require("socket.io");
-const io = socketio(app);
+const io = socketio(server);
 const chatService = require("./services/chat.service");
 
 app.use(cors());

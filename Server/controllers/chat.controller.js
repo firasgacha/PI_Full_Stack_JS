@@ -10,16 +10,24 @@ module.exports = {
 			$or: [{ user_1: idUser }, { user_2: idUser }],
 		})
 			.select("-messages")
-			.then((data) => {
-				const chats = data.map((chat) => {
-					const { user_1, user_2 } = chat;
-					const otherId = user_1 === idUser ? user_2 : user_1;
-					const { name } = await User.findById(otherId).select("name -_id");
-					return {
-						...chat._doc,
-						other: name,
-					};
-				});
+			.then(async (data) => {
+				console.log(data);
+				const chats = await Promise.all(
+					data.map(
+						async (chat) =>
+							new Promise(async (resolve, reject) => {
+								const { user_1, user_2 } = chat;
+								const otherId = user_1 === idUser ? user_2 : user_1;
+								const { name } = await User.findById(otherId).select(
+									"name -_id"
+								);
+								resolve({
+									...chat._doc,
+									other: name,
+								});
+							})
+					)
+				);
 				res.status(200).json({
 					status: "SUCCESS",
 					chats,
@@ -42,8 +50,61 @@ module.exports = {
 		}
 	},
 	createChat: async (req, res) => {
+		const { idUser, owner } = req.body;
+		if (idUser === owner) {
+			return res.status(400).json({
+				status: "ERROR",
+				message: "You can't chat with yourself",
+			});
+		}
+		const chat = await Chat.findOne({
+			$or: [
+				{ user_1: idUser, user_2: owner },
+				{ user_1: owner, user_2: idUser },
+			],
+		});
+		if (chat) {
+			return res.status(400).json({
+				status: "ERROR",
+				message: "Chat already exists",
+			});
+		}
+		const newChat = new Chat({
+			user_1: idUser,
+			user_2: owner,
+			messages: [],
+		});
+		try {
+			newChat.save();
+			res.status(201).json({
+				status: "SUCCESS",
+				newChat,
+			});
+		} catch (error) {
+			res.status(400).json({ message: error.message });
+		}
+	},
+	createChatFromStore: async (req, res) => {
 		const { idUser, idStore } = req.body;
 		const { owner } = await Store.findById(idStore);
+		if (idUser === owner) {
+			return res.status(400).json({
+				status: "ERROR",
+				message: "You can't chat with yourself",
+			});
+		}
+		const chat = await Chat.findOne({
+			$or: [
+				{ user_1: idUser, user_2: owner },
+				{ user_1: owner, user_2: idUser },
+			],
+		});
+		if (chat) {
+			return res.status(400).json({
+				status: "ERROR",
+				message: "Chat already exists",
+			});
+		}
 		const newChat = new Chat({
 			user_1: idUser,
 			user_2: owner,
