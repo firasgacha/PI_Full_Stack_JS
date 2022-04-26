@@ -18,21 +18,6 @@ router.post('/', async function (req, res)  {
     }
 });
 
-router.post('/add', async function (req, res) {
-    var rate=new Rate({
-        Stars:req.body.stars
-    });
-    const finduser = User.findById(req.body.id_u);
-    const docuser = await finduser.exec();
-    if(docuser)
-        rate.User=docuser
-    rate.save();
-    const findproduct = Product.findById(req.body.id_p);
-    const docproduct = await findproduct.exec();
-    docproduct.Rate.push(rate);
-    docproduct.save();
-});
-
 router.post('/update', async function (req, res) {
     const findrate = Rate.findByIdAndUpdate(req.body.id_r,
         {

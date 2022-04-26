@@ -18,21 +18,6 @@ router.post('/', async function (req, res)  {
     }
 });
 
-router.post('/add', async function (req, res) {
-    var feedback=new Feedback({
-        Comment:req.body.comment
-    });
-    const finduser = User.findById(req.body.id_u);
-    const docuser = await finduser.exec();
-    if(docuser)
-        feedback.User=docuser
-    feedback.save();
-    const findproduct = Product.findById(req.body.id_p);
-    const docproduct = await findproduct.exec();
-    docproduct.Feedback.push(feedback);
-    docproduct.save();
-});
-
 router.post('/update', async function (req, res) {
     const findfeedback = Feedback.findByIdAndUpdate(req.body.id_f,
         {

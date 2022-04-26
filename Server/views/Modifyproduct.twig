@@ -9,6 +9,8 @@
     <input hidden value="{{ docproduct._id }}" id="id_p" type="text" name="id_p">
     <label>Categorie</label>
     <input value="{{ docproduct.Categorie.name }}" id="categorie" type="text" name="categorie" required>
+    <label>Description</label>
+    <input id="description" value="{{ docproduct.Description }}" type="text" name="description" required>
     <label>Etat</label>
     <input value="{{ docproduct.Etat }}" id="etat" type="text" name="etat" required>
     <label>Price</label>

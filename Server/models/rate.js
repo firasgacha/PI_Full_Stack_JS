@@ -7,7 +7,7 @@ var rate=new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }
-})
+},{ timestamps: true })
 var rat=mongoose.model('rating',rate);
 
 module.exports = {

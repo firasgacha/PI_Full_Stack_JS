@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var {Product,Categorie,Image}=require('../models/product');
 var {Store}=require("../models/store.model");
-var {User}=require("../models/user.model");
+var User=require("../models/user.model");
 var {Rate}=require("../models/rate");
 var {Feedback}=require("../models/feedback");
 var prodcutsController=require("../controllers/productsController")
@@ -49,6 +49,7 @@ router.post('/add',  upload.array('multi_files'), async function (req, res) {
             {
                 Price:req.body.price,
                 Categorie:cat,
+                Description:req.body.description,
                 Etat:req.body.etat,
                 Store:store
             }
@@ -74,6 +75,7 @@ router.post('/update', upload.array('multi_files'), async function (req, res) {
         {
             Price:req.body.price,
             Categorie:cat,
+            Description:req.body.description,
             Etat:req.body.etat
         });
     const docproduct = await findproduct.exec();
@@ -93,6 +95,32 @@ router.post('/delete', async function (req, res) {
     try {
         await Product.findByIdAndDelete(req.body.id_p).exec();
         res.json({msg: "Deleted!"})
+    }catch(err){
+        return res.status(500).json({msg: err.message})
+    }
+});
+
+router.post('/combined', async function (req, res) {
+    try {
+        var rate=new Rate({
+            Stars:req.body.stars
+        });
+        var feedback=new Feedback({
+            Comment:req.body.comment
+        });
+        const finduser = User.findById(req.body.id_u);
+        const docuser = await finduser.exec();
+        if(docuser) {
+            rate.User = docuser
+            feedback.User=docuser
+        }
+        rate.save();
+        feedback.save();
+        const findproduct = Product.findById(req.body.id_p);
+        const docproduct = await findproduct.exec();
+        docproduct.Rate.push(rate);
+        docproduct.Feedback.push(feedback);
+        docproduct.save();
     }catch(err){
         return res.status(500).json({msg: err.message})
     }

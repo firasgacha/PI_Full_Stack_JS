@@ -8,6 +8,7 @@ exports.getproductsjson=async function (request, result) {
         result.json(d_product)
     });
 }
+
 exports.getproducts=async function (request, result) {
     Product.find(function (error,d_product){
         if(error)

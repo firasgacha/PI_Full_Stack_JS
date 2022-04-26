@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {queryApi} from "../../tools/queryApi";
 import {Alert} from "@mui/material";
 
+
 export default function AddModifyProduct(props){
     const [type, setType] = useState(props.type);
     const [formdata, setFormData] = useState(props.formdata);
@@ -28,7 +29,7 @@ export default function AddModifyProduct(props){
         e.preventDefault();
         console.log(formdata);
         if(type=="Modify"){
-            const [, err] = await queryApi("update", formdata, "POST", true);
+            const [, err] = await queryApi("products/update", formdata, "POST", true);
             if (err) {
                 setErrors({
                     visbile: true,
@@ -39,7 +40,7 @@ export default function AddModifyProduct(props){
             setTimeout(()=>setShow(false),3000);
         }
         else {
-            const [, err] = await queryApi("add", formdata, "POST", true);
+            const [, err] = await queryApi("products/add", formdata, "POST", true);
             if (err) {
                 setErrors({
                     visbile: true,
@@ -61,7 +62,7 @@ export default function AddModifyProduct(props){
         p_button=<input accept='image/*' type="file" multiple onChange={(e) => onChangeFile(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"></input>
         text_button="Update";
     }
-    const {categorie, price, etat}=formdata
+    const {categorie, description,price, etat}=formdata
     return(
         <>
         <div className="text-blueGray-400 text-center mb-3 font-bold">
@@ -76,6 +77,15 @@ export default function AddModifyProduct(props){
                         Category
                     </label>
                     <input name="categorie" value={categorie} type="text" placeholder="Product Category" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
+                </div>
+                <div className="form-group relative w-full mb-3" >
+                    <label
+                        className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                        htmlFor="grid-password"
+                    >
+                        Description
+                    </label>
+                    <input name="description" value={description} type="text" placeholder="Product Description" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
                 </div>
                 <div className="form-group relative w-full mb-3">
                     <label
