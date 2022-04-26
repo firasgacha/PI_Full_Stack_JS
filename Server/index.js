@@ -8,8 +8,13 @@ const Complaint = require("./routes/Complaint");
 var productsRouter = require("./routes/products");
 var ratingsRouter = require("./routes/ratings");
 var feedbacksRouter = require("./routes/feedbacks");
+const http = require("http");
 const path = require("path");
-const app = express();
+const server = express();
+const app = http.createServer(server);
+const socketio = require("socket.io");
+const io = socketio(app);
+
 app.use(cors());
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -45,6 +50,8 @@ mongoose.connect(
 		console.log("Connected to mongodb");
 	}
 );
+
+require("controllers/chat.controller");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
