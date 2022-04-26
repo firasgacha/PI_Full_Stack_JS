@@ -4,6 +4,10 @@ import axios from 'axios'
 import {showErrMsg, showSuccessMsg} from "../../components/utils/notification/Notification";
 import {dispatchLogin} from "../../redux/actions/authAction";
 import {useDispatch} from 'react-redux'
+import { GoogleLogin } from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
+
+
 
 const initialState = {
   email: '',
@@ -13,7 +17,7 @@ const initialState = {
 }
 
 export default function Login() {
-  
+
   const [user, setUser] = useState(initialState)
   const dispatch = useDispatch()
   const history = useHistory()
@@ -39,7 +43,35 @@ export default function Login() {
     }
 
   }
+  const responseGoogle = async (response) => {
+    try {
+      const res = await axios.post('/user/google_login', {tokenId: response.tokenId})
 
+      setUser({...user, error:'', success: res.data.msg})
+      localStorage.setItem('firstLogin', true)
+
+      dispatch(dispatchLogin())
+      history.push('/')
+    } catch (err) {
+      err.response.data.msg &&
+      setUser({...user, err: err.response.data.msg, success: ''})
+    }
+  }
+  const responseFacebook = async (response) => {
+    try {
+      const {accessToken, userID} = response
+      const res = await axios.post('/user/facebook_login', {accessToken, userID})
+
+      setUser({...user, error:'', success: res.data.msg})
+      localStorage.setItem('firstLogin', true)
+
+      dispatch(dispatchLogin())
+      history.push('/')
+    } catch (err) {
+      err.response.data.msg &&
+      setUser({...user, err: err.response.data.msg, success: ''})
+    }
+  }
 
   return (
       <>
@@ -65,17 +97,23 @@ export default function Login() {
                       />
                       Github
                     </button>
-                    <button
-                        className="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-                        type="button"
-                    >
-                      <img
-                          alt="..."
-                          className="w-5 mr-1"
-                          src={require("assets/img/google.svg").default}
+
+                    <div className="btn-wrapper text-center" >
+                      <FacebookLogin
+
+                          appId="351959560299687"
+                          autoLoad={false}
+                          fields="name,email,picture"
+                          callback={responseFacebook}
                       />
-                      Google
-                    </button>
+                      <GoogleLogin
+                          clientId="305530628613-mjddgv545p8k18jal0gqhvc167n5858p.apps.googleusercontent.com"
+                          buttonText="Login with Google"
+                          onSuccess={responseGoogle}
+                          onFailure={responseGoogle}
+                          cookiePolicy={'single_host_origin'}
+                      />
+                    </div>
                   </div>
                   <hr className="mt-6 border-b-1 border-blueGray-300" />
                 </div>

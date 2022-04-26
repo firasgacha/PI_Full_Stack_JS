@@ -18,27 +18,21 @@ const userSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: [true, "Please enter your address!"],
     },
     city: {
         type: String,
-        required: [true, "Please enter your city!"],
     },
     state: {
         type: String,
-        required: [true, "Please enter your state!"],
     },
     zip: {
         type: String,
-        required: [true, "Please enter your Zip/Postal code!"],
     },
     country: {
         type: String,
-        required: [true, "Please enter your country!"],
     },
     telephone: {
         type: String,
-        required: [true, "Please enter your address!"],
     }
     ,
     role: {
