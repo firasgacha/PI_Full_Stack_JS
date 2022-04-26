@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Chat = require("../models/chat.model");
+const User = require("../models/user.model");
+const Store = require("../models/store.model");
 
 module.exports = {
 	getChatsByUserId: async (req, res) => {
@@ -7,10 +9,20 @@ module.exports = {
 		Chat.find({
 			$or: [{ user_1: idUser }, { user_2: idUser }],
 		})
+			.select("-messages")
 			.then((data) => {
+				const chats = data.map((chat) => {
+					const { user_1, user_2 } = chat;
+					const otherId = user_1 === idUser ? user_2 : user_1;
+					const { name } = await User.findById(otherId).select("name -_id");
+					return {
+						...chat._doc,
+						other: name,
+					};
+				});
 				res.status(200).json({
 					status: "SUCCESS",
-					data,
+					chats,
 				});
 			})
 			.catch((err) => {
@@ -30,7 +42,13 @@ module.exports = {
 		}
 	},
 	createChat: async (req, res) => {
-		const newChat = new Chat(req.body);
+		const { idUser, idStore } = req.body;
+		const { owner } = await Store.findById(idStore);
+		const newChat = new Chat({
+			user_1: idUser,
+			user_2: owner,
+			messages: [],
+		});
 		try {
 			newChat.save();
 			res.status(201).json({
