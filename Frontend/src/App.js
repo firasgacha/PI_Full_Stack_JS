@@ -26,6 +26,8 @@ import MyComplaints from "./views/complaint/MyComplaints";
 import Store from "./views/Store";
 import MyStores from "./views/MyStores";
 import SendMessage from "./views/messages/SendMessage";
+import Contact from "./views/contactUs/Contact";
+import HomePage from "./views/HomePage";
 
 function App() {
 	const dispatch = useDispatch();
@@ -68,6 +70,7 @@ function App() {
 					{/* add routes without layouts */}
 					<Route path="/complaint" exact component={SendComplaint} />
 					<Route path="/message" exact component={SendMessage} />
+					<Route path="/Contact" exact component={Contact} />
 					<Route path="/mycomplaints" exact component={MyComplaints} />
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/user/reset/:token" exact component={ResetPassword} />
@@ -80,7 +83,7 @@ function App() {
 					<Route path="/store/:id" exact component={Store} />
 					<Route path="/user-stores/:id" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
-					<Route path="/" exact component={Index} />
+					<Route path="/" exact component={HomePage} />
 					{/* add redirect for first page */}
 					<Redirect from="*" to="/" />
 				</Switch>
