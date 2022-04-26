@@ -1,52 +1,44 @@
 const mongoose = require("mongoose");
 const Chat = require("../models/chat.model");
 
-io.on("connection", (socket) => {
-	socket.on("joinRoom", ({ username, room }) => {
-		const user = userJoin(socket.id, username, room);
-
-		socket.join(user.room);
-
-		// Welcome current user
-		socket.emit("message", formatMessage(botName, "Welcome to ChatCord!"));
-
-		// Broadcast when a user connects
-		socket.broadcast
-			.to(user.room)
-			.emit(
-				"message",
-				formatMessage(botName, `${user.username} has joined the chat`)
-			);
-
-		// Send users and room info
-		io.to(user.room).emit("roomUsers", {
-			room: user.room,
-			users: getRoomUsers(user.room),
-		});
-	});
-
-	// Listen for chatMessage
-	socket.on("chatMessage", (msg) => {
-		const user = getCurrentUser(socket.id);
-
-		io.to(user.room).emit("message", formatMessage(user.username, msg));
-	});
-
-	// Runs when client disconnects
-	socket.on("disconnect", () => {
-		const user = userLeave(socket.id);
-
-		if (user) {
-			io.to(user.room).emit(
-				"message",
-				formatMessage(botName, `${user.username} has left the chat`)
-			);
-
-			// Send users and room info
-			io.to(user.room).emit("roomUsers", {
-				room: user.room,
-				users: getRoomUsers(user.room),
+module.exports = {
+	getChatsByUserId: async (req, res) => {
+		const { idUser } = req.params;
+		Chat.find({
+			$or: [{ user_1: idUser }, { user_2: idUser }],
+		})
+			.then((data) => {
+				res.status(200).json({
+					status: "SUCCESS",
+					data,
+				});
+			})
+			.catch((err) => {
+				res.status(500).send({ message: err.message });
 			});
+	},
+	getChatByID: async (req, res) => {
+		try {
+			Chat.findById(req.params.id).then((data) =>
+				res.json({
+					status: "SUCCESS",
+					data,
+				})
+			);
+		} catch (error) {
+			res.status(404).json({ message: error.message });
 		}
-	});
-});
+	},
+	createChat: async (req, res) => {
+		const newChat = new Chat(req.body);
+		try {
+			newChat.save();
+			res.status(201).json({
+				status: "SUCCESS",
+				newChat,
+			});
+		} catch (error) {
+			res.status(400).json({ message: error.message });
+		}
+	},
+};

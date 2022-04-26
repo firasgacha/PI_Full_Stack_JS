@@ -14,6 +14,7 @@ const server = express();
 const app = http.createServer(server);
 const socketio = require("socket.io");
 const io = socketio(app);
+const chatService = require("./services/chat.service");
 
 app.use(cors());
 app.set("views", path.join(__dirname, "views"));
@@ -28,7 +29,6 @@ app.use(cookieParser());
 // }))
 
 // Routes
-
 app.use("/user", require("./routes/userRouter"));
 app.use("/api", require("./routes/upload"));
 app.use("/products", productsRouter);
@@ -36,6 +36,7 @@ app.use("/ratings", ratingsRouter);
 app.use("/feedbacks", feedbacksRouter);
 app.use("/complaint", Complaint);
 app.use("/store", require("./routes/store.router"));
+app.use("/chat", require("./routes/chat.router"));
 
 //Connect to mongodb
 const URI = process.env.MONGODB_URL;
@@ -51,7 +52,25 @@ mongoose.connect(
 	}
 );
 
-require("controllers/chat.controller");
+io.on("connection", (socket) => {
+	socket.on("joinRoom", ({ userId, room }) => {
+		const user = chatService.userJoin(socket.id, userId, room);
+		socket.join(user.room);
+		console.log(`${user.userId} has joined ${user.room}`);
+	});
+
+	// Listen for chatMessage
+	socket.on("chatMessage", (msg) => {
+		const user = chatService.getCurrentUser(socket.id);
+		chatService.saveMessage(user, msg);
+		io.to(user.room).emit("message", formatMessage(user.userId, msg));
+	});
+
+	// Runs when client disconnects
+	socket.on("disconnect", () => {
+		chatService.userLeave(socket.id);
+	});
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

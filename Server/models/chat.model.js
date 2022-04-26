@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 
 const Chat = mongoose.Schema(
 	{
-		user: {
+		user_1: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
 		},
-		store: {
+		user_2: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Store",
+			ref: "User",
 			required: true,
 		},
 		messages: [
@@ -18,7 +18,7 @@ const Chat = mongoose.Schema(
 				image: String,
 				sender: {
 					type: String,
-					enum: ["user", "store"],
+					enum: ["user", "storeOwner"],
 					default: "user",
 				},
 				timestamp: {
