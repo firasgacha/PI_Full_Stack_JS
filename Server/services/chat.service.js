@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 const Chat = require("../models/chat.model");
-const users = [];
+let users = [];
 
 module.exports = {
 	// Join user to chat
 	userJoin(socketId, userId, room) {
-		if (users.indexOf(userId) === -1) {
+		if (users.indexOf((el) => userId == el.userId) === -1) {
+			console.log("User joined");
 			const user = { socketId, userId, room };
 			users.push(user);
 			return user;
@@ -29,6 +30,7 @@ module.exports = {
 
 	// save message to db
 	saveMessage(user, message) {
+		console.log(users);
 		Chat.findOne({ id: user.room }).then((chat) => {
 			chat.messages.push(message);
 			chat.save();

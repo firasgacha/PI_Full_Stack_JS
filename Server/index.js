@@ -78,6 +78,11 @@ io.on("connect", (socket) => {
 		console.log("Client has Left");
 		chatService.userLeave(socket.id);
 	});
+
+	// Runs when client disconnects
+	socket.on("disconnect", () => {
+		chatService.userLeave(socket.id);
+	});
 });
 
 const PORT = process.env.PORT || 5000;

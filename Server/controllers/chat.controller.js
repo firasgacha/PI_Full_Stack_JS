@@ -11,13 +11,12 @@ module.exports = {
 		})
 			.select("-messages")
 			.then(async (data) => {
-				console.log("data fetched");
 				const chats = await Promise.all(
 					data.map(
 						async (chat) =>
 							new Promise(async (resolve, reject) => {
 								const { user_1, user_2 } = chat;
-								const otherId = user_1 === idUser ? user_2 : user_1;
+								const otherId = user_1 == idUser ? user_2 : user_1;
 								const { name } = await User.findById(otherId).select(
 									"name -_id"
 								);

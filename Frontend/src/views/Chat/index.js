@@ -24,6 +24,7 @@ export default function Chat() {
 	const messages = useRef(null);
 
 	socket.on("message", (message) => {
+		console.log(message);
 		setMessageList((messageList) => [...messageList, message]);
 		messages.current.scrollTop = messages.current.scrollHeight;
 	});
@@ -39,14 +40,15 @@ export default function Chat() {
 			messages.current.value = messageList.map((message) => Message(message));
 			messages.current.scrollTop = messages.current.scrollHeight;
 		};
-		const leavenRoom = () => {
+		const leaveRoom = () => {
 			socket.emit("leaveRoom");
 		};
 		fetchData(id);
 		return () => {
-			leavenRoom();
+			leaveRoom();
+			socket.disconnect();
 		};
-	}, []);
+	}, [id]);
 
 	useEffect(() => {
 		const joinRoom = (user, id) => {
@@ -55,7 +57,7 @@ export default function Chat() {
 		if (user) {
 			joinRoom(user, id);
 		}
-	}, [user]);
+	}, [id, user]);
 
 	useEffect(() => {
 		if (chatInfo.user1Info) {
@@ -75,7 +77,7 @@ export default function Chat() {
 				}
 			});
 		}
-	}, [chatInfo, user]);
+	}, [id, chatInfo, user]);
 
 	const sendMsg = (e) => {
 		e.preventDefault();
@@ -106,17 +108,19 @@ export default function Chat() {
 						<h3>
 							<i className="fas fa-users"></i> Older Messages:
 						</h3>
-						<OlderMessages userId={user?._id} roomdId={id} />
+						{user._id ? <OlderMessages userId={user._id} roomId={id} /> : ""}
 					</div>
 					<div ref={messages} className={chatStyle.chatMessages}>
-						{messageList.map((message, index) => (
-							<Message
-								key={index}
-								message={message}
-								user={user}
-								other={other}
-							/>
-						))}
+						{user._id
+							? messageList.map((message, index) => (
+									<Message
+										key={index}
+										message={message}
+										user={user}
+										other={other}
+									/>
+							  ))
+							: ""}
 					</div>
 				</main>
 				<div className={chatStyle.chatFormContainer}>
