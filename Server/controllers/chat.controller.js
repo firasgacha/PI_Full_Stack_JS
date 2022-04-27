@@ -39,12 +39,23 @@ module.exports = {
 	},
 	getChatByID: async (req, res) => {
 		try {
-			Chat.findById(req.params.id).then((data) =>
+			id = new mongoose.Types.ObjectId(req.params.id);
+			Chat.findById(id).then(async (data) => {
+				const user1Info = await User.findById(data.user_1).select(
+					"name avatar -_id"
+				);
+				const user2Info = await User.findById(data.user_2).select(
+					"name avatar -_id"
+				);
 				res.json({
 					status: "SUCCESS",
-					data,
-				})
-			);
+					data: {
+						...data._doc,
+						user1Info,
+						user2Info,
+					},
+				});
+			});
 		} catch (error) {
 			res.status(404).json({ message: error.message });
 		}
@@ -66,7 +77,8 @@ module.exports = {
 		if (chat) {
 			return res.status(400).json({
 				status: "ERROR",
-				message: "Chat already exists",
+				message: "Chat already exists!!",
+				id: chat._id,
 			});
 		}
 		const newChat = new Chat({
@@ -102,7 +114,8 @@ module.exports = {
 		if (chat) {
 			return res.status(400).json({
 				status: "ERROR",
-				message: "Chat already exists",
+				message: "Chat already exists!",
+				id: chat._id,
 			});
 		}
 		const newChat = new Chat({
@@ -117,6 +130,7 @@ module.exports = {
 				newChat,
 			});
 		} catch (error) {
+			console.log("here");
 			res.status(400).json({ message: error.message });
 		}
 	},

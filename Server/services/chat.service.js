@@ -4,7 +4,7 @@ const users = [];
 
 module.exports = {
 	// Join user to chat
-	userJoin(id, userId, room) {
+	userJoin(socketId, userId, room) {
 		const user = { socketId, userId, room };
 
 		users.push(user);

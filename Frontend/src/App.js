@@ -26,6 +26,7 @@ import MyComplaints from "./views/complaint/MyComplaints";
 import Store from "./views/Store";
 import MyStores from "./views/MyStores";
 import SendMessage from "./views/messages/SendMessage";
+import Chat from "views/Chat";
 
 function App() {
 	const dispatch = useDispatch();
@@ -78,6 +79,7 @@ function App() {
 					/>
 					<Route path="/landing" exact component={Landing} />
 					<Route path="/store/:id" exact component={Store} />
+					<Route path="/chats/:id" exact component={isLogged ? Chat : Auth} />
 					<Route path="/user-stores/:id" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
 					<Route path="/" exact component={Index} />

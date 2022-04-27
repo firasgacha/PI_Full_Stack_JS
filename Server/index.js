@@ -8,12 +8,10 @@ const Complaint = require("./routes/Complaint");
 var productsRouter = require("./routes/products");
 var ratingsRouter = require("./routes/ratings");
 var feedbacksRouter = require("./routes/feedbacks");
-const http = require("http");
 const path = require("path");
 const app = express();
-const server = http.createServer(app);
-const socketio = require("socket.io");
-const io = socketio(server);
+const http = require("http").Server(app);
+const io = require("socket.io")(http, { cors: { origin: "*" } });
 const chatService = require("./services/chat.service");
 
 app.use(cors());
@@ -52,11 +50,13 @@ mongoose.connect(
 	}
 );
 
-io.on("connection", (socket) => {
+io.on("connect", (socket) => {
 	socket.on("joinRoom", ({ userId, room }) => {
-		const user = chatService.userJoin(socket.id, userId, room);
-		socket.join(user.room);
-		console.log(`${user.userId} has joined ${user.room}`);
+		if (userId) {
+			const user = chatService.userJoin(socket.id, userId, room);
+			socket.join(user.room);
+			console.log(`${userId} has joined ${user.room}`);
+		}
 	});
 
 	// Listen for chatMessage
@@ -68,11 +68,12 @@ io.on("connection", (socket) => {
 
 	// Runs when client disconnects
 	socket.on("disconnect", () => {
+		console.log("Client has disconnected");
 		chatService.userLeave(socket.id);
 	});
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
 	console.log("Server is running on port", PORT);
 });

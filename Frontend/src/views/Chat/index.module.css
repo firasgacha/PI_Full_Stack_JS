@@ -40,14 +40,14 @@ a {
 
 /* Chat Page */
 
-.chat-container {
+.chatContainer {
     max-width: 1100px;
     background: #fff;
     margin: 30px auto;
     overflow: hidden;
 }
 
-.chat-header {
+.chatHeader {
     background: var(--dark-color-a);
     color: #fff;
     border-top-left-radius: 5px;
@@ -58,40 +58,40 @@ a {
     justify-content: space-between;
 }
 
-.chat-main {
+.chatMain {
     display: grid;
     grid-template-columns: 1fr 3fr;
 }
 
-.chat-sidebar {
+.chatSidebar {
     background: var(--dark-color-b);
     color: #fff;
     padding: 20px 20px 60px;
     overflow-y: scroll;
 }
 
-.chat-sidebar h2 {
+.chatSidebar h2 {
     font-size: 20px;
     background: rgba(0, 0, 0, 0.1);
     padding: 10px;
     margin-bottom: 20px;
 }
 
-.chat-sidebar h3 {
+.chatSidebar h3 {
     margin-bottom: 15px;
 }
 
-.chat-sidebar ul li {
+.chatSidebar ul li {
     padding: 10px 0;
 }
 
-.chat-messages {
+.chatMessages {
     padding: 30px;
     max-height: 500px;
     overflow-y: scroll;
 }
 
-.chat-messages .message {
+.chatMessages .message {
     padding: 10px;
     margin-bottom: 15px;
     background-color: var(--light-color);
@@ -99,7 +99,7 @@ a {
     overflow-wrap: break-word;
 }
 
-.chat-messages .message .meta {
+.chatMessages .message .meta {
     font-size: 15px;
     font-weight: bold;
     color: var(--dark-color-b);
@@ -107,20 +107,20 @@ a {
     margin-bottom: 7px;
 }
 
-.chat-messages .message .meta span {
+.chatMessages .message .meta span {
     color: #777;
 }
 
-.chat-form-container {
+.chatFormContainer {
     padding: 20px 30px;
     background-color: var(--dark-color-a);
 }
 
-.chat-form-container form {
+.chatFormContainer form {
     display: flex;
 }
 
-.chat-form-container input[type='text'] {
+.chatFormContainer input[type='text'] {
     font-size: 16px;
     padding: 5px;
     height: 40px;
@@ -128,13 +128,13 @@ a {
 }
 
 /* Join Page */
-.join-container {
+.joinContainer {
     max-width: 500px;
     margin: 80px auto;
     color: #fff;
 }
 
-.join-header {
+.joinHeader {
     text-align: center;
     padding: 20px;
     background: var(--dark-color-a);
@@ -142,45 +142,45 @@ a {
     border-top-right-radius: 5px;
 }
 
-.join-main {
+.joinMain {
     padding: 30px 40px;
     background: var(--dark-color-b);
 }
 
-.join-main p {
+.joinMain p {
     margin-bottom: 20px;
 }
 
-.join-main .form-control {
+.joinMain .form-control {
     margin-bottom: 20px;
 }
 
-.join-main label {
+.joinMain label {
     display: block;
     margin-bottom: 5px;
 }
 
-.join-main input[type='text'] {
+.joinMain input[type='text'] {
     font-size: 16px;
     padding: 5px;
     height: 40px;
     width: 100%;
 }
 
-.join-main select {
+.joinMain select {
     font-size: 16px;
     padding: 5px;
     height: 40px;
     width: 100%;
 }
 
-.join-main .btn {
+.joinMain .btn {
     margin-top: 20px;
     width: 100%;
 }
 
 @media (max-width: 700px) {
-    .chat-main {
+    .chatMain {
         display: block;
     }
 

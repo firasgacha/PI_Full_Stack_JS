@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-
+import { useSelector } from "react-redux";
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import axios from "axios";
-import { render } from "react-dom";
 
 const StoreInfoInit = {
 	fullName: "Joe Store",
@@ -26,8 +25,11 @@ const StoreInfoInit = {
 
 export default function Store() {
 	const { id } = useParams();
+	const auth = useSelector((state) => state.auth);
+	const navigate = useHistory();
 
 	const [StoreInfo, setStoreInfo] = useState(StoreInfoInit);
+	const { user, isAdmin } = auth;
 
 	useEffect(() => {
 		axios.get(`/store/${id}`).then((res) => {
@@ -39,6 +41,21 @@ export default function Store() {
 			setStoreInfo(res.data);
 		});
 	}, [id]);
+
+	const startChat = () => {
+		const owner = StoreInfo.owner;
+		const userId = user._id;
+		axios
+			.post("/chat", { owner: owner, userId: userId })
+			.then((res) => {
+				console.log(res);
+				navigate(`/chat/${res.data._id}`);
+			})
+			.catch((err) => {
+				console.log(err);
+				navigate(`/chat/${err.id}`);
+			});
+	};
 
 	const storeExists = () => {
 		return (
