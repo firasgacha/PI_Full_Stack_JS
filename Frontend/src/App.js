@@ -33,6 +33,7 @@ function App() {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.token);
 	const auth = useSelector((state) => state.auth);
+	const {isAdmin}= auth;
 
 	useEffect(() => {
 		const firstLogin = localStorage.getItem("firstLogin");
@@ -65,7 +66,7 @@ function App() {
 			<BrowserRouter>
 				<Switch>
 					{/* add routes with layouts */}
-					<Route path="/admin" component={Admin} />
+					<Route path="/admin" component={isAdmin ? Admin : Index} />
 					<Route path="/auth" component={isLogged ? Index : Auth} />
 					{/* add routes without layouts */}
 					<Route path="/complaint" exact component={SendComplaint} />
