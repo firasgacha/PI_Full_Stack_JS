@@ -26,8 +26,12 @@ import MyComplaints from "./views/complaint/MyComplaints";
 import Store from "./views/Store";
 import MyStores from "./views/MyStores";
 import SendMessage from "./views/messages/SendMessage";
+<<<<<<< HEAD
 import Contact from "./views/contactUs/Contact";
 import HomePage from "./views/HomePage";
+=======
+import Chat from "views/Chat";
+>>>>>>> chat-realtime
 
 function App() {
 	const dispatch = useDispatch();
@@ -82,6 +86,7 @@ function App() {
 					/>
 					<Route path="/landing" exact component={Landing} />
 					<Route path="/store/:id" exact component={Store} />
+					<Route path="/chats/:id" exact component={isLogged ? Chat : Auth} />
 					<Route path="/user-stores/:id" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
 					<Route path="/" exact component={HomePage} />
