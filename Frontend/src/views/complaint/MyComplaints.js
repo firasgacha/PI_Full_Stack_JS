@@ -7,6 +7,7 @@ import ModalChat from "../../components/Modal/ModalChat";
 import ModalImage from "../../components/Modal/ModalImage";
 import Button from '@mui/material/Button';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { data } from "autoprefixer";
 
 
 
@@ -16,7 +17,9 @@ export default function MyComplaints() {
   const [openTab, setOpenTab] = useState(1);
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
-  const [Data, setData] = useState([]);
+  const [DataOpen, setDataOpen] = useState([]);
+  const [DataClosed, setDataClosed] = useState([]);
+  const [Data, setDataPending] = useState([]);
 
 
   const auth = useSelector(state => state.auth)
@@ -24,7 +27,7 @@ export default function MyComplaints() {
   const [connected, setConnceted] = useState(false);
   const { user, isAdmin } = auth
   const [callback, setCallback] = useState(false)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const getComplaintsByUser = async () => {
     await api.getComplaintByUserId(userId)
@@ -35,10 +38,17 @@ export default function MyComplaints() {
           alert(message, status)
         }
         else {
-          setData(data);
-          console.log(result);
+          setDataPending(data);
+          // console.log(data);
         }
       }).catch(err => { console.log(err) })
+  }
+
+  const getComplaintOpen = async () => {
+    setDataOpen(Data.filter(item => item.status === "Open"));
+  }
+  const getComplaintClosed = async () => {
+    setDataClosed(Data.filter(item => item.status === "Closed"));
   }
 
   useEffect(() => {
@@ -48,7 +58,9 @@ export default function MyComplaints() {
         setUserId(res.data._id)
         setUserName(res.data.name)
         setConnceted(true)
-        getComplaintsByUser();
+        getComplaintsByUser()
+        getComplaintClosed()
+        getComplaintOpen()
       })
     }
   }, [token, isAdmin, dispatch, callback, userId])
@@ -162,7 +174,7 @@ export default function MyComplaints() {
                     <div className="px-4 py-5 flex-auto">
                       <div className="tab-content tab-space">
                         <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={getComplaintsByUser}>
+                          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={getComplaintOpen}>
                             Refresh
                           </Button>
                           <table className="items-center w-full bg-transparent border-collapse">
@@ -228,7 +240,7 @@ export default function MyComplaints() {
                               </tr>
                             </thead>
                             <tbody>
-                              {Data.map((item) =>
+                              {DataOpen.map((item) =>
                                 <tr key={item.id}>
                                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                     {item.type}
@@ -244,7 +256,7 @@ export default function MyComplaints() {
                                     {item.description}
                                   </td>
                                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    <ModalChat userName={userName} complId={item._id} msgs={item.msgs} refresh={getComplaintsByUser} />
+                                    <ModalChat onOFF={item.status} onClick={getComplaintsByUser} userName={userName} complId={item._id} msgs={item.msgs} refresh={getComplaintsByUser} />
                                   </td>
                                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
                                     <ModalImage image={item.image} />
@@ -254,16 +266,98 @@ export default function MyComplaints() {
                             </tbody>
                           </table>
                         </div>
-                        <div className={openTab === 2 ? "block" : "hidden"} id="link2">
-                          <p>
-                            Completely synergize resource taxing relationships via
-                            premier niche markets. Professionally cultivate one-to-one
-                            customer service with robust ideas.
-                            <br />
-                            <br />
-                            Dynamically innovate resource-leveling customer service for
-                            state of the art customer service.
-                          </p>
+                        <div className={openTab === 2 ? "block" : "hidden"} id="link1">
+                          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={getComplaintClosed}>
+                            Refresh
+                          </Button>
+                          <table className="items-center w-full bg-transparent border-collapse">
+                            <thead>
+                              <tr>
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                >
+                                  Problem Type
+                                </th>
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                >
+                                  Status
+                                </th>
+
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                >
+                                  Date
+                                </th>
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                >
+                                  Description
+                                </th>
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                ></th>
+                                <th
+                                  className={
+                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                    (color === "light"
+                                      ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                      : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                                  }
+                                ></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {DataClosed.map((item) =>
+                                <tr key={item.id}>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {item.type}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    <i className="fas fa-circle text-red-500 mr-2"></i>{" "}
+                                    {item.status}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {item.createdAt.toString().substring(0, 10)}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {item.description}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    <ModalChat onOFF={item.status} onClick={getComplaintsByUser} userName={userName} complId={item._id} msgs={item.msgs} refresh={getComplaintsByUser} />
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
+                                    <ModalImage image={item.image} />
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
                         </div>
                         <div className={openTab === 3 ? "block" : "hidden"} id="link3">
                           <p>

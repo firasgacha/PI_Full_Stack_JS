@@ -88,6 +88,8 @@ export default function ChatBox(props) {
                 }
                 else {
                     console.log(result);
+                    props.refresh();
+                    
                 }
             }).catch(err => { console.log(err.message) })
     }
@@ -150,9 +152,9 @@ export default function ChatBox(props) {
                         //margin="normal"
                         onChange={(e) => setMsg(e.target.value)}
                     />
-                    <Button type='reset' variant="contained" color="primary" className={classes.button}onClick={() => {
+                    <Button type ='reset' variant="contained" color="primary" className={classes.button} 
+                    onClick={() => {
                     sendMsg();
-                    props.refresh();
                 }}>
                         <SendIcon />
                     </Button>
