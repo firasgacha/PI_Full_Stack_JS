@@ -11,7 +11,7 @@ module.exports = {
 		})
 			.select("-messages")
 			.then(async (data) => {
-				console.log(data);
+				console.log("data fetched");
 				const chats = await Promise.all(
 					data.map(
 						async (chat) =>

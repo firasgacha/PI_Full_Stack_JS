@@ -5,16 +5,17 @@ const users = [];
 module.exports = {
 	// Join user to chat
 	userJoin(socketId, userId, room) {
-		const user = { socketId, userId, room };
-
-		users.push(user);
-
-		return user;
+		if (users.indexOf(userId) === -1) {
+			const user = { socketId, userId, room };
+			users.push(user);
+			return user;
+		}
+		return;
 	},
 
 	// Get current user
 	getCurrentUser(id) {
-		return users.find((user) => user.id === id);
+		return users.find((user) => user.socketId === id);
 	},
 
 	// User leaves chat
@@ -28,14 +29,9 @@ module.exports = {
 
 	// save message to db
 	saveMessage(user, message) {
-		const msg = {
-			content: message.content,
-			image: message.image,
-			sender: user.userId,
-			timestamp: Date.now(),
-		};
-		const chat = Chat.find({ id: user.room });
-		chat.messages.push(msg);
-		chat.save();
+		Chat.findOne({ id: user.room }).then((chat) => {
+			chat.messages.push(message);
+			chat.save();
+		});
 	},
 };

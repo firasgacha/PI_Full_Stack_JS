@@ -17,9 +17,9 @@ const Chat = mongoose.Schema(
 				content: { type: String, required: true },
 				image: String,
 				sender: {
-					type: String,
-					enum: ["user", "storeOwner"],
-					default: "user",
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
 				},
 				timestamp: {
 					type: Date,

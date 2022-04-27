@@ -1,59 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
 import chatStyle from "./index.module.css";
-import io from "socket.io-client";
 import axios from "axios";
 import Message from "./message";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import OlderMessages from "./OlderMessages";
+import { socket } from "../../socket";
 // messages =  document.getElementById("messages");
 
-export default function Chat() {
-	const socket = io.connect("ws://localhost:5000");
+const otherInit = {
+	_id: "",
+	name: "",
+	avatar: "",
+};
 
+export default function Chat() {
 	const { id } = useParams();
 	const { user, isAdmin } = useSelector((state) => state.auth);
 	const [chatInfo, setChatInfo] = useState({});
 	const [messageList, setMessageList] = useState([]);
-	const [other, setOther] = useState({});
+	const [other, setOther] = useState(otherInit);
 	const msgText = useRef(null);
 	const messages = useRef(null);
 
 	socket.on("message", (message) => {
 		setMessageList((messageList) => [...messageList, message]);
 		messages.current.scrollTop = messages.current.scrollHeight;
-		const msg = new Message(message);
-		messages.appendChild(msg);
 	});
 
 	useEffect(() => {
 		const fetchData = async (id) => {
 			await axios.get(`/chat/${id}`).then((res) => {
 				const { data } = res;
+				setChatInfo(data.data);
 				setMessageList(data.data.messages);
-				setOther(() => {
-					if (data.data.user_1 === user._id) {
-						return {
-							_id: data.data.user_2,
-							name: data.data.user2Info.name,
-							avatar: data.data.user2Info.avatar,
-						};
-					} else {
-						return {
-							_id: data.data.user_1,
-							name: data.data.user1Info.name,
-							avatar: data.data.user1Info.avatar,
-						};
-					}
-				});
 			});
+
 			messages.current.value = messageList.map((message) => Message(message));
 			messages.current.scrollTop = messages.current.scrollHeight;
 		};
+		const leavenRoom = () => {
+			socket.emit("leaveRoom");
+		};
 		fetchData(id);
 		return () => {
-			socket.emit("disconnect");
-			socket.disconnect();
+			leavenRoom();
 		};
 	}, []);
 
@@ -66,16 +57,32 @@ export default function Chat() {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		if (chatInfo.user1Info) {
+			setOther(() => {
+				if (chatInfo.user_1 === user._id) {
+					return {
+						_id: chatInfo.user_2,
+						name: chatInfo.user2Info.name,
+						avatar: chatInfo.user2Info.avatar,
+					};
+				} else {
+					return {
+						_id: chatInfo.user_1,
+						name: chatInfo.user1Info.name,
+						avatar: chatInfo.user1Info.avatar,
+					};
+				}
+			});
+		}
+	}, [chatInfo, user]);
+
 	const sendMsg = (e) => {
 		e.preventDefault();
 
-		const msg = msgText.current.value;
+		const msg = { content: msgText.current.value, image: "" };
 
-		socket.emit("message", {
-			username: user.id,
-			text: msg,
-			room: id,
-		});
+		socket.emit("chatMessage", msg);
 		console.log("Message Sent");
 
 		msgText.current.value = "";
@@ -92,20 +99,28 @@ export default function Chat() {
 				</header>
 				<main className={chatStyle.chatMain}>
 					<div className={chatStyle.chatSidebar}>
+						<h2 id="room-name">
+							<img src={other.avatar} alt="" />
+							<Link to={"/user-stores/" + other._id}> {other.name}</Link>
+						</h2>
 						<h3>
-							<i className="fas fa-comments"></i> Room Name:
-							<Link to={"/user-stores/" + other._id}>{other.name}</Link>
+							<i className="fas fa-users"></i> Older Messages:
 						</h3>
-						<h2 id="room-name"></h2>
-						<h3>
-							<i className="fas fa-users"></i> Users
-						</h3>
-						<ul id="users"></ul>
+						<OlderMessages userId={user?._id} roomdId={id} />
 					</div>
-					<div ref={messages} className={chatStyle.chatMessages}></div>
+					<div ref={messages} className={chatStyle.chatMessages}>
+						{messageList.map((message, index) => (
+							<Message
+								key={index}
+								message={message}
+								user={user}
+								other={other}
+							/>
+						))}
+					</div>
 				</main>
 				<div className={chatStyle.chatFormContainer}>
-					<form id="chatForm">
+					<form id="chatForm" onSubmit={sendMsg}>
 						<input
 							id="msg"
 							type="text"
@@ -114,7 +129,7 @@ export default function Chat() {
 							autoComplete="off"
 							ref={msgText}
 						/>
-						<button onClick={sendMsg} className={chatStyle.btn}>
+						<button type="submit" className={chatStyle.btn}>
 							<i className="fas fa-paper-plane"></i> Send
 						</button>
 					</form>

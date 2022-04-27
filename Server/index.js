@@ -62,13 +62,20 @@ io.on("connect", (socket) => {
 	// Listen for chatMessage
 	socket.on("chatMessage", (msg) => {
 		const user = chatService.getCurrentUser(socket.id);
-		chatService.saveMessage(user, msg);
-		io.to(user.room).emit("message", formatMessage(user.userId, msg));
+		console.log(msg);
+		const message = {
+			content: msg.content,
+			image: msg.image,
+			sender: user.userId,
+			timestamp: Date.now(),
+		};
+		chatService.saveMessage(user, message);
+		io.to(user.room).emit("message", message);
 	});
 
 	// Runs when client disconnects
-	socket.on("disconnect", () => {
-		console.log("Client has disconnected");
+	socket.on("leaveRoom", () => {
+		console.log("Client has Left");
 		chatService.userLeave(socket.id);
 	});
 });
