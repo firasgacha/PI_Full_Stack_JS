@@ -6,7 +6,6 @@ import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import OlderMessages from "./OlderMessages";
 import { socket } from "../../socket";
-// messages =  document.getElementById("messages");
 
 const otherInit = {
 	_id: "",
@@ -40,12 +39,9 @@ export default function Chat() {
 			messages.current.value = messageList.map((message) => Message(message));
 			messages.current.scrollTop = messages.current.scrollHeight;
 		};
-		const leaveRoom = () => {
-			socket.emit("leaveRoom");
-		};
 		fetchData(id);
 		return () => {
-			leaveRoom();
+			socket.emit("leaveRoom");
 			socket.disconnect();
 		};
 	}, [id]);
@@ -84,7 +80,7 @@ export default function Chat() {
 
 		const msg = { content: msgText.current.value, image: "" };
 
-		socket.emit("chatMessage", msg);
+		socket.emit("chatMessage", { msg, idRoom: id });
 		console.log("Message Sent");
 
 		msgText.current.value = "";

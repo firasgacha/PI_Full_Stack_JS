@@ -29,9 +29,9 @@ module.exports = {
 	},
 
 	// save message to db
-	saveMessage(user, message) {
+	saveMessage(user, idRoom, message) {
 		console.log(users);
-		Chat.findOne({ id: user.room }).then((chat) => {
+		Chat.findOne({ id: idRoom }).then((chat) => {
 			chat.messages.push(message);
 			chat.save();
 		});

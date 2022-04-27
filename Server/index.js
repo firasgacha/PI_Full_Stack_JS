@@ -60,7 +60,7 @@ io.on("connect", (socket) => {
 	});
 
 	// Listen for chatMessage
-	socket.on("chatMessage", (msg) => {
+	socket.on("chatMessage", ({ msg, idRoom }) => {
 		const user = chatService.getCurrentUser(socket.id);
 		console.log(msg);
 		const message = {
@@ -69,7 +69,7 @@ io.on("connect", (socket) => {
 			sender: user.userId,
 			timestamp: Date.now(),
 		};
-		chatService.saveMessage(user, message);
+		chatService.saveMessage(user, idRoom, message);
 		io.to(user.room).emit("message", message);
 	});
 
