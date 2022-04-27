@@ -4,7 +4,35 @@ const Complaint = require("../models/complaint.model");
 module.exports = {
 	getComplaintByUserId: async(req, res) => {
 		const { id } = req.params;
-		Complaint.find({ userId: id })
+		Complaint.find({ userId: id})
+			.then((data) => {
+				res.status(200).json({
+					status: "SUCCESS",
+					message: "Complaint Found",
+					data,
+				});
+			})
+			.catch((err) => {
+				res.status(500).send({ message: err.message });
+			});
+	},
+	getComplaintByUserIdAndStatus: async(req, res) => {
+		const { id } = req.params;
+		Complaint.find({ userId: id},{status:status})
+			.then((data) => {
+				res.status(200).json({
+					status: "SUCCESS",
+					message: "Complaint Found",
+					data,
+				});
+			})
+			.catch((err) => {
+				res.status(500).send({ message: err.message });
+			});
+	},
+	getComplaintByStatus: async(req, res) => {
+		const { status } = req.params;
+		Complaint.find({ status: status })
 			.then((data) => {
 				res.status(200).json({
 					status: "SUCCESS",

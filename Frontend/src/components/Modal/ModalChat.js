@@ -1,9 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import Channel from '../../views/complaint/Channel';
 import ChatBox from '../../components/Message/index';
 
 const style = {
@@ -22,10 +20,17 @@ export default function ModalChat(props) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const [onOFF, setOnOFF] = React.useState(true);
+  React.useEffect(() => {
+    if (props.onOFF !=='Open') {
+      setOnOFF(true);
+    } else {
+      setOnOFF(false);
+    }
+  }, [props.onOFF]);
   return (
     <div>
-      <Button onClick={handleOpen}>Open modal</Button>
+      <Button onClick={handleOpen} disabled={onOFF}>Open Chat</Button>
       <Modal
         open={open}
         onClose={handleClose}

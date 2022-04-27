@@ -9,8 +9,10 @@ const {
 	deleteComplaint,
 	getComplaintByUserId,
 	updateComplaintStatus,
-	sendMsgComplaint
-} = require("../controllers/Complaint.js");
+	sendMsgComplaint,
+	getComplaintByUserIdAndStatus,
+	getComplaintByStatus
+} = require("../controllers/complaintController");
 
 //send messages
 router.patch("/send_msg/:id",sendMsgComplaint);
@@ -28,5 +30,9 @@ router.get("/getComplaints", getComplaint);
 router.get("/getOneComplaint/:id", getOneComplaint);
 
 router.get("/getComplaintByUserId/:id", getComplaintByUserId);
+
+router.get("/getComplaintByStatus/:status", getComplaintByStatus);
+
+router.get("/getComplaintByUserIdAndStatus/:id/status", getComplaintByUserIdAndStatus);
 
 module.exports = router;

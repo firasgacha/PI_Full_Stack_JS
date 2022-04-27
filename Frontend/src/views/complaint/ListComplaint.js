@@ -176,9 +176,7 @@ export default function GetComplaintsData () {
                       <ModalImage image={item.image}/>        
                       </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                    {/* <ModalChat userName={userName} complId={item._id} msgs={item.msgs} refresh={getComplaintsByUser} /> */}
-
-                      <ModalChat userName={userName} complId={item._id} msgs={item.msgs} refresh={GetComplaintsData} />
+                      <ModalChat onOFF={item.status} onClick={GetComplaintsData} userName={userName} complId={item._id} msgs={item.msgs} refresh={GetComplaintsData} />
                     </td>
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">                      
                     <TableDropdown />
