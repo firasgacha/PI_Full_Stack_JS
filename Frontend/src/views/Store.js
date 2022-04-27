@@ -44,16 +44,16 @@ export default function Store() {
 
 	const startChat = () => {
 		const owner = StoreInfo.owner;
-		const userId = user._id;
+		const idUser = user._id;
 		axios
-			.post("/chat", { owner: owner, userId: userId })
+			.post("http://localhost:5000/chat", { owner, idUser })
 			.then((res) => {
 				console.log(res);
-				navigate(`/chat/${res.data._id}`);
+				navigate.push(`/chats/${res.data.newChat._id}`);
 			})
 			.catch((err) => {
 				console.log(err);
-				navigate(`/chat/${err.id}`);
+				navigate.push(`/chats/${err.response.data.id}`);
 			});
 	};
 
@@ -100,6 +100,14 @@ export default function Store() {
 												<b>instagram: </b>
 
 												{StoreInfo.contact.instagram}
+											</li>
+											<li>
+												<button
+													className="bg-white text-lightBlue-400 shadow-lg font-normal h-20 w-20 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+													onClick={startChat}
+												>
+													Chat With
+												</button>
 											</li>
 										</ul>
 									</div>
