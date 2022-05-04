@@ -57,6 +57,7 @@ export default function GetComplaintsData () {
     useEffect(() => {
       GetComplaintsData();
     },[]);
+    
     useEffect(() => {
       if (token) {
         fetchUser(token).then(res => {
