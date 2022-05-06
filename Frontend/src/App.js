@@ -74,6 +74,7 @@ function App() {
 					<Route path="/admin" component={isAdmin ? Admin : Index} />
 					<Route path="/auth" component={isLogged ? Index : Auth} />
 					{/* add routes without layouts */}
+					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/complaint" exact component={SendComplaint} />
 					<Route path="/message" exact component={SendMessage} />
 					<Route path="/Contact" exact component={Contact} />

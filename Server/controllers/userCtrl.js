@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("./sendMail");
 const {google} = require('googleapis')
 const fetch = require('node-fetch')
+const mongoose = require("mongoose");
 const {OAuth2} = google.auth
+const User = mongoose.model("Users")
 
 const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID )
 
@@ -203,6 +205,45 @@ const userCtrl = {
 		}
 	},
 	getUsersAllinfo: async (req, res) => {
+		try {
+			let query = Users.find();
+
+			const page = parseInt(req.query.page) || 1;
+			const pageSize = parseInt(req.query.pageSize) || 3;
+			const skip = (page - 1) * pageSize;
+			const total= await Users.countDocuments();
+
+			const pages = Math.ceil(total/ pageSize);
+
+			query = query.skip(skip).limit(pageSize);
+			if(page > pages){
+				res.status(404).json({
+					status: "fail",
+					message: "Page not found",
+				})
+			}
+
+			const result = await query;
+			res.status(200).json({
+				status: "success",
+				count: result.length,
+				page,
+				pages,
+				data: result
+			})
+
+			//const users = await Users.find().select("-password");
+			//res.json({total: users.length, users});
+		} catch (err) {
+			//return res.status(500).json({ msg: err.message });
+			console.log(err);
+			res.status(500).json({
+				status: "error",
+				msg: "Server Error"
+			})
+		}
+	},
+	getUsersAllinfoo: async (req, res) => {
 		try {
 			const users = await Users.find().select("-password");
 			res.json(users);
