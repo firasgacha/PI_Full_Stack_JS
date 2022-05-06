@@ -89,7 +89,7 @@ export default function CardPageVisits() {
 
   };
   for (var i in Users)
-    if(Users[i]['name'].indexOf(value)!=-1 || Users[i]['email'].indexOf(value)!=-1 ||Users[i]['id'].indexOf(value)!=-1 )
+    if(Users[i]['name'].indexOf(value)!=-1 || Users[i]['email'].indexOf(value)!=-1 )
       save.push(Users[i]);
 
   if(value=="")
