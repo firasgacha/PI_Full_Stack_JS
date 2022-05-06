@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from "components/Navbars/AuthNavbar.js";
 import { Link } from 'react-router-dom';
 
 
-export default function Contact() {
+export default function Contact(props) {
   const [description, setDescription] = React.useState('');
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [userId, setUserId] = React.useState('');
+  const [show, setShow] = React.useState(true);
+  useEffect(() => {
+    if (props.show==false) {
+      setShow(false);
+    }} , []);
   return (
     <>
-      <Navbar transparent />
+      {show ? <Navbar transparent /> : null}
       <section className="pb-20 relative block bg-blueGray-800">
         <div
           className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"

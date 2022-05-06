@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import { deepOrange } from "@material-ui/core/colors";
@@ -114,6 +114,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+
 //avatarが左にあるメッセージ（他人）
 export const MessageLeft = (props) => {
   const message = props.message ? props.message : "no message";
@@ -121,6 +122,27 @@ export const MessageLeft = (props) => {
   const photoURL = props.photoURL ? props.photoURL : "dummy.js";
   const displayName = props.displayName ? props.displayName : "User";
   const classes = useStyles();
+   //translate
+   const [options, setOptions] = useState([]);
+   const [to, setTo] = useState('en');
+   const axios = require('axios').default;
+   const [output, setOutput] = useState("");
+
+  //  const translate = (msg) => {
+  //       const params = new URLSearchParams();
+  //       params.append('q', msg);
+  //       params.append('source', 'auto');
+  //       params.append('target', to);
+  //       params.append('api_key', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+  
+  //       axios.post('https://libretranslate.de/translate', params,
+  //           {
+  //               headers: {
+  //                   'accept': 'application/json',
+  //                   'Content-Type': 'application/x-www-form-urlencoded'
+  //               },
+  //           }).then(res => setOutput(res.data.translatedText));
+  // };
   return (
     <>
       <div className={classes.messageRow}>
@@ -134,11 +156,18 @@ export const MessageLeft = (props) => {
           <div className={classes.messageBlue}>
             <div>
               <p className={classes.messageContent}>{message}</p>
+              {/* <p>{output}</p>      */}
             </div>
             <div className={classes.messageTimeStampRight}>{timestamp.toString().substring(0, 10)}</div>
           </div>
         </div>
-      </div>
+        {/* <select onChange={e => setTo(e.target.value)} class="select select-bordered w-full max-w-xs">
+                        <option key="Origin" value="Origin">Origin Text</option>
+                        <option key="en" value="en">English</option>
+                        <option key="fr" value="fr">French</option>
+                        <option key="ar" value="ar" onClick={translate(message)}>Arabic</option>
+        </select> */}
+        </div>
     </>
   );
 };

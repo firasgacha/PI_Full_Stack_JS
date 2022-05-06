@@ -2,19 +2,17 @@ import React,{ useEffect, useState } from 'react'
 const axios = require('axios').default;
 
 export default function Translate() {
-    const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState([]);
   const [to, setTo] = useState('en');
   const [from, setFrom] = useState('en');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-
+  const params = new URLSearchParams();
+  params.append('q', '<p class="green">Hello!</p>');
+  params.append('source', 'auto');
+  params.append('target', 'ar');
+  params.append('api_key','xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
   const translate = () => {
-    const params = new URLSearchParams();
-    params.append('q', input);
-    params.append('source', 'auto');
-    params.append('target', to);
-    params.append('api_key','xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
-
     axios.post('https://libretranslate.de/translate',params,
       {
         headers: {
@@ -23,6 +21,7 @@ export default function Translate() {
         },
       }).then(res => setOutput(res.data.translatedText));
   };
+  
   return (
     <div>
     <div>
