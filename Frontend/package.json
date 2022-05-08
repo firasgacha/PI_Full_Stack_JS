@@ -20,6 +20,7 @@
     "chart.js": "2.9.4",
     "cloudinary-react": "^1.7.2",
     "daisyui": "^2.14.3",
+    "face-api.js": "^0.22.2",
     "flowbite": "^1.4.5",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.8",

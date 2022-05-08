@@ -29,6 +29,7 @@ import SendMessage from "./views/messages/SendMessage";
 import Contact from "./views/contactUs/Contact";
 import Translate from "./components/Translate/Translate";
 import HomePage from "./views/HomePage";
+import IdentityVerif from "./views/IdentityVerif";
 
 
 
@@ -38,7 +39,7 @@ function App() {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.token);
 	const auth = useSelector((state) => state.auth);
-	const {isAdmin}= auth;
+	const { isAdmin } = auth;
 
 	useEffect(() => {
 		const firstLogin = localStorage.getItem("firstLogin");
@@ -79,6 +80,7 @@ function App() {
 					<Route path="/message" exact component={SendMessage} />
 					<Route path="/Contact" exact component={Contact} />
 					<Route path="/mycomplaints" exact component={MyComplaints} />
+					<Route path="/IdentityVerif" exact component={IdentityVerif} />
 					<Route path="/translate" exact component={Translate} />
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/user/reset/:token" exact component={ResetPassword} />

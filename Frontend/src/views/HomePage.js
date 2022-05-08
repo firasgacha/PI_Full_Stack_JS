@@ -22,13 +22,20 @@ export default function HomePage() {
         </h2>
       </div>
       <br />
-       <CarouselProducts/>
+      <CarouselProducts />
+      <br />
+      <div class="carousel w-full">
+        <div id="item1" class="carousel-item w-full">
+          <img src="https://media.mytek.tn/media/webp_image/wysiwyg/banner/Avrl22/pc-portable-gamer-msi-1290-252px-2.webp" class="w-full" />
+        </div>
+      </div>
       <br />
       <Stats />
       <br />
       <br />
+
       <br />
-      <Contact show={false}/>
+      <Contact show={false} />
       <Footer />
     </>
   )
