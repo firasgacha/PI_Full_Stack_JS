@@ -20,6 +20,8 @@ const initialState = {
 export default function Profile() {
 	const auth = useSelector(state => state.auth)
 	const token = useSelector(state => state.token)
+	const users = useSelector(state => state.users)
+
 
 	const{user} = auth
 	const [data,setData] = useState(initialState)
