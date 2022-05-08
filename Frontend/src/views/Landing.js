@@ -461,6 +461,7 @@ export default function Landing() {
                           </Box>
                       </CardContent>
                       <CardActions>
+                        <Button style={{outline:"none"}} size="small">Store</Button>
                         <Button onClick={()=>handleOpen({prod:prod})}  style={{outline:"none"}} size="small">Details</Button>
                         {(() =>{
                           if(isLogged){
