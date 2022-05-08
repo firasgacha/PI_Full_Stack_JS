@@ -7,7 +7,7 @@ var feedback=new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }
-})
+},{ timestamps: true })
 var fee=mongoose.model('feedback',feedback);
 
 module.exports = {

@@ -3,13 +3,25 @@ import Chart from "chart.js";
 import {useApi} from "../../hooks/useApi";
 
 export default function CardLineChart() {
-  const [products,err,relaod]= useApi('getjson');
+  const [products,err,relaod]= useApi('products/getjson');
   var save_name=[];
   var save_price=[];
   for (var i in products) {
     save_name.push(products[i]['Categorie']['name']);
     save_price.push(products[i]['Price'])
 
+  }
+  for(var a=0; a<save_price.length; a++){
+    for(var b=a+1; b<save_price.length; b++){
+      if(save_price[b]>save_price[a]) {
+        var d=save_name[a]
+        var c = save_price[a]
+        save_price[a] = save_price[b]
+        save_name[a]=save_name[b]
+        save_price[b] = c
+        save_name[b]=d
+      }
+    }
   }
   React.useEffect(() => {
     var config = {

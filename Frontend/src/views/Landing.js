@@ -1,12 +1,274 @@
-import React from "react";
-import { Link } from "react-router-dom";
-
-// components
-
+import React, {useEffect, useRef, useState} from "react";
+import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
+import {useDispatch, useSelector} from "react-redux";
+import {dispatchGetAllUsers, fetchAllUsers} from "../redux/actions/userActions";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Paper,
+  Typography,
+  Modal, ImageList, ImageListItem, Popover, Grid, Avatar, TextField, Alert
+} from "@mui/material";
+import {useApi} from "../hooks/useApi";
+import {styled}  from '@mui/system';
+import Box from "@mui/material/Box";
+import Rating from "@mui/material/Rating";
+import {Link} from "react-router-dom";
+import PropTypes from "prop-types";
+import clsx from 'clsx';
+import StarIcon from '@mui/icons-material/Star';
+import ListFeedbacksRatingsImages from "../components/Cards/ListFeedbacksRatingsImages";
+import {AccountCircle} from "@mui/icons-material";
+import {queryApi} from "../tools/queryApi";
+import {esES} from "@mui/material/locale";
+
+const BackdropUnstyled = React.forwardRef((props, ref) => {
+  const { open, className, ...other } = props;
+  return (
+      <div
+          className={clsx({ 'MuiBackdrop-open': open }, className)}
+          ref={ref}
+          {...other}
+      />
+  );
+});
+
+BackdropUnstyled.propTypes = {
+  className: PropTypes.string.isRequired,
+  open: PropTypes.bool,
+};
+
+const styleratecomment = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 440,
+  bgcolor: 'background.paper',
+  boxShadow: '0 3px 7px rgba(25, 118, 210, 0.3);',
+  p: 4,
+};
+
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  boxShadow: '0 3px 7px rgba(25, 118, 210, 0.3);',
+  p: 4,
+};
+const Backdrop = styled(BackdropUnstyled)`
+  z-index: -1;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.05) !important;
+  -webkit-tap-highlight-color: transparent;
+`;
+
+const labels = {
+  0: 'Useless',
+  1: 'Useless+',
+  2: 'Poor',
+  3: 'Ok',
+  4: 'Good',
+  5: 'Excellent',
+};
+
+function getLabelText(value) {
+  return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
+}
+
 
 export default function Landing() {
+  const[dataindex,setDataindex]=useState({
+    categorie:"",
+    description:"",
+    price:0,
+    etat:"",
+    multi_files:[],
+    rate:[],
+    feedback:[]
+  })
+  const[dataadd,setDataadd]=useState({
+    id_p:""
+  })
+  const [show, setShow] = useState(false);
+  const auth = useSelector(state => state.auth)
+  const users = useSelector(state => state.users)
+  const token = useSelector(state => state.token)
+  const {user , isLogged} = auth
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if(isLogged) {
+      fetchAllUsers(token).then(res => {
+        dispatch(dispatchGetAllUsers(res))
+      })
+    }
+  },[dispatch,isLogged])
+
+  const [open, setOpen] =useState(false);
+  const [opentwo, setOpentwo] =useState(false);
+  let [products,err,relaod]= useApi('products/getjson');
+  let [productstimer,errtimer,relaodtimer]= useApi('products/getjson');
+  const [errors, setErrors] = useState({ visbile: false, message: "" });
+  const [value, setValue] = useState(2);
+  const [hover, setHover] = useState(-1);
+  const [valuecomment, setValuecomment] = useState("");
+  let inputNode=useRef();
+  let check_add=false;
+  let check_del=false;
+  let check_auth;
+  let msg;
+
+  function handleOpen(prod){
+    setDataindex({
+      categorie:prod['prod'].Categorie.name,
+      description:prod['prod'].Description,
+      price:prod['prod'].Price,
+      etat:prod['prod'].Etat,
+      multi_files:prod['prod'].Images,
+      rate:prod['prod'].Rate,
+      feedback:prod['prod'].Feedback
+    });
+    setOpen(true);
+  }
+
+  function handleOpentwo(id) {
+    setDataadd({id_p: id})
+    setOpentwo(true);
+  }
+
+  const handleClosetwo= () => {
+    setDataadd({id_p: ""});
+    setHover(-1);
+    setValue(2);
+    setValuecomment("");
+    setOpentwo(false);
+  }
+
+
+  const handleClose = () => {
+    setDataindex({
+      categorie:"",
+      description:"",
+      price:0,
+      etat:"",
+      multi_files:[],
+      rate:[],
+      feedback:[]
+    });
+    setOpen(false);
+  }
+
+  useEffect(() => {
+    const interval = setInterval(relaodtimer, 1000);
+    return () => {
+      clearInterval(interval);}
+  }, []);
+
+  /**
+   * Suppression d'une manière dynamique
+   */
+  if(productstimer!=null) {
+    if (productstimer.length) {
+      for (var a in productstimer) {
+        for (var b in products) {
+          for (var c in productstimer) {
+            if (products[b]['_id'] == productstimer[c]['_id']) {
+              check_del = true
+            }
+          }
+          if (!check_del)
+            products.splice(products[b], 1)
+          check_del = false;
+        }
+      }
+    }else
+      products.length=0
+  }
+
+
+  /**
+   * Ajout,Modification
+   * d'une manière dynamique
+   */
+  for (var i in productstimer) {
+    for (var j in products) {
+      if (productstimer[i]['_id'] == products[j]['_id']) {
+        if (products[j]['Categorie']['name'] != productstimer[i]['Categorie']['name'])
+          products[j]['Categorie']['name'] = productstimer[i]['Categorie']['name']
+        if (products[j]['Description'] != productstimer[i]['Description'])
+          products[j]['Description'] = productstimer[i]['Description']
+        if (products[j]['Etat'] != productstimer[i]['Etat'])
+          products[j]['Etat'] = productstimer[i]['Etat']
+        if (products[j]['Price'].toString() != productstimer[i]['Price'].toString())
+          products[j]['Price'] = productstimer[i]['Price']
+        if (!(JSON.stringify(products[j]['Feedback']) === JSON.stringify(productstimer[i]['Feedback'])))
+          products[j]['Feedback'] = productstimer[i]['Feedback']
+        if (!(JSON.stringify(products[j]['Rate']) === JSON.stringify(productstimer[i]['Rate'])))
+          products[j]['Rate'] = productstimer[i]['Rate']
+        if (!(JSON.stringify(products[j]['Images']) === JSON.stringify(productstimer[i]['Images'])))
+          products[j]['Images'] = productstimer[i]['Images']
+        check_add = true;
+      }
+    }
+    if (!check_add)
+      products.push(productstimer[i])
+
+    check_add = false;
+  }
+
+  if(show)
+    msg=<Alert severity="info" onClose={() => setShow(false)} >
+      Thanks for sharing with us
+    </Alert>
+
+  const submit = async (e)=>{
+    e.preventDefault();
+    if (window.confirm("Are you sure ?")) {
+      setShow(true)
+      setTimeout(()=>setShow(false),2000);
+      setTimeout(()=>handleClosetwo(),2000);
+    const [, errtwo] = await queryApi("products/combined", {id_u:user._id,id_p:dataadd.id_p,comment:valuecomment, stars: value}, "POST", false);
+    if (errtwo) {
+      setErrors({
+        visbile: true,
+        message: JSON.stringify(errtwo.errors, null, 2),
+      });
+    }
+    }
+  }
+
+  if(isLogged)
+    check_auth=<>
+        <h1 className="text-white font-semibold text-5xl">
+      Welcome back.
+    </h1>
+  <p className="mt-4 text-lg text-blueGray-200">
+      {user['name']}
+    </p>
+    </>
+  else
+    check_auth=<>
+      <h1 className="text-white font-semibold text-5xl">
+        <Link to="/auth/login">Login or</Link>
+      </h1>
+        <p className="mt-4 text-lg text-blueGray-200">
+      <Link to="/auth/register">Create your account</Link>
+    </p>
+      </>
+
   return (
     <>
       <Navbar transparent />
@@ -28,14 +290,7 @@ export default function Landing() {
             <div className="items-center flex flex-wrap">
               <div className="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
                 <div className="pr-12">
-                  <h1 className="text-white font-semibold text-5xl">
-                    Your story starts with us.
-                  </h1>
-                  <p className="mt-4 text-lg text-blueGray-200">
-                    This is a simple example of a Landing Page you can build
-                    using Notus React. It features multiple CSS components based
-                    on the Tailwind CSS design system.
-                  </p>
+                  {check_auth}
                 </div>
               </div>
             </div>
@@ -63,502 +318,365 @@ export default function Landing() {
 
         <section className="pb-20 bg-blueGray-200 -mt-24">
           <div className="container mx-auto px-4">
+
             <div className="flex flex-wrap">
-              <div className="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
+              {
+                  products &&  products.map((prod,index) =>
+              <div key={index} className="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
                 <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
                   <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400">
-                      <i className="fas fa-award"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Awarded Agency</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Divide details about your product or agency work into
-                      parts. A paragraph describing a feature will be enough.
-                    </p>
+                    <Card sx={{ maxWidth: 345 }}>
+                      <div className="card__title">
+                        <div className="icon">
+                          <a className="carda" href="#"></a>
+                        </div>
+                        <h3 className="cardh3">{prod.Etat}</h3>
+                      </div>
+                      <div className="slider">
+                        <div className="slides">
+
+
+                      {
+                        prod.Images.map((img,index) =>
+                            <div key={index}>
+                              <img id="taswira2" src={img.img}
+                                   className="w-full align-middle rounded-t-lg bg-white"/>
+                            </div>
+
+                        )}
+                        </div>
+                      </div>
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {prod.Price+" Dt"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {prod.Categorie.name}
+                        </Typography>
+                          <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexDirection:'column'
+                              }}
+                          >
+                            {(() => {
+                              if(prod.Rate.length==0){
+                          return <> <Rating
+                                name="hover-feedback"
+                                value={0}
+                                precision={0.5}
+                                readOnly
+                            />
+
+                                <Box sx={{ml: 0.5}}><p>Pas d'indication</p></Box>
+                          </>
+                              }else {
+                                return <> <Rating
+                                    name="hover-feedback"
+                                    value={(prod.Rate.reduce(function (accumulateur, valeurCourante) {
+                                      return accumulateur + valeurCourante.Stars;
+                                    },0)/prod.Rate.length).toFixed(2)}
+                                    precision={0.5}
+                                    readOnly
+                                />
+                              <Box sx={{ml: 0.5}}>
+
+                                <PopupState variant="popover" popupId="demo-popup-popover">
+                                  {(popupState) => (
+                                      <div>
+                                        <Button className="focus:outline-none" variant="contained" {...bindTrigger(popupState)}>
+                                          {(prod.Rate.reduce(function (accumulateur, valeurCourante) {
+                                          return accumulateur + valeurCourante.Stars;
+                                        }, 0) / prod.Rate.length).toFixed(2)}
+
+                                        </Button>
+                                        <Popover
+                                            {...bindPopover(popupState)}
+                                            anchorOrigin={{
+                                              vertical: 'bottom',
+                                              horizontal: 'center',
+                                            }}
+                                            transformOrigin={{
+                                              vertical: 'top',
+                                              horizontal: 'center',
+                                            }}
+                                        >
+                                          <Typography sx={{ p: 2 }}>
+                                            {(() => {
+                                              if(isLogged) {
+                                                let user_name = []
+                                                for (var c in prod.Rate) {
+                                                  for (var d in users) {
+                                                    if (prod.Rate[c]['User'] == users[d]['_id'])
+                                                      user_name.push(users[d]['name'])
+                                                  }
+                                                }
+                                                let p=[];
+                                                let index=0;
+                                                for (var b in prod.Rate)
+                                                {
+                                                  p.push(
+                                                   <Box key={index}
+                                                      sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        flexDirection: 'column'
+                                                      }}
+                                                  >
+                                                     {user_name[index++]}
+                                                    <Rating
+                                                        name="hover-feedback"
+                                                        value={prod.Rate[b]['Stars']}
+                                                        getLabelText={getLabelText}
+                                                        readOnly
+                                                    />
+                                                    {(
+                                                        <Box sx={{ml: 0.5}}>{+prod.Rate[b]['Stars'] + " " + labels[prod.Rate[b]['Stars']]}</Box>
+                                                    )}
+                                                    <p style={{textAlign: "left", color: "gray"}}>
+                                                      {prod.Rate[b].updatedAt + "."}
+                                                    </p>
+                                                     <hr width="80%" />
+                                                  </Box>)
+                                                }
+                                                return <div style={{ padding: 14,fontFamily: "sans-serif" }} >
+                                                  <h1>Stars</h1>
+                                                  {p}
+                                                </div>
+                                              }
+                                              else
+                                                return <p>Please Login !</p>
+                                            })()}
+                                          </Typography>
+                                        </Popover>
+                                      </div>
+                                  )}
+                                </PopupState>
+                              </Box>
+                                </>
+                              }
+                            })()}
+
+                          </Box>
+                      </CardContent>
+                      <CardActions>
+                        <Button onClick={()=>handleOpen({prod:prod})}  style={{outline:"none"}} size="small">Details</Button>
+                        {(() =>{
+                          if(isLogged){
+                            return <>
+                            {(() =>{
+                              let verif=false;
+                              for(var enter1 in prod.Rate) {
+                                if (user._id == prod.Rate[enter1]['User'])
+                                  verif = true;
+                              }
+                              if(!verif)
+                                return <> <Button onClick={()=>handleOpentwo(prod._id)}  style={{outline:"none"}} size="small">Rate / Leave your Comment</Button>
+                                  <Button  style={{outline:"none"}} size="small">Add to list</Button></>
+                              else
+                                return <>
+                                  <Button  style={{outline:"none"}} size="small" disabled>Rate / Leave your Comment</Button>
+                                  <Button  style={{outline:"none"}} size="small">Add to list</Button>
+                                </>
+                            })()}
+                            </>
+                          }
+                          else{
+                            return <>
+                              <Button  style={{outline:"none"}} size="small" disabled>Rate / Leave your Comment</Button>
+                              <Button  style={{outline:"none"}} size="small" disabled>Add to list</Button>
+                            </>
+                          }
+                        })()}
+                      </CardActions>
+                    </Card>
                   </div>
                 </div>
-              </div>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                    BackdropComponent={Backdrop}
+                >
+                  <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                      Details
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                      {(() => {
+                        const {categorie, description,price, etat,multi_files,rate,feedback}=dataindex
 
-              <div className="w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
-                  <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400">
-                      <i className="fas fa-retweet"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Free Revisions</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Keep you user engaged by providing meaningful information.
-                      Remember that by this time, the user is curious.
-                    </p>
+                      return <Box sx={{ width: 500, height: 450, overflowY: 'scroll' }}>
+                        <ImageList variant="masonry" cols={3} gap={8}>
+                          {multi_files.map((item) => (
+                              <ImageListItem key={item.img}>
+                                <img
+                                    src={`${item.img}?w=248&fit=crop&auto=format`}
+                                    srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                    alt={item.title}
+                                    loading="lazy"
+                                />
+                              </ImageListItem>
+                          ))}
+                        </ImageList>
+                        <div style={{ padding: 14,fontFamily: "sans-serif" }} >
+                          <h1>{categorie}</h1>
+                              <Paper key={index} style={{ padding: "40px 20px", marginTop: 20 }}>
+                                <Grid container wrap="nowrap" spacing={2}>
+                                  <Grid justifyContent="left" item xs zeroMinWidth>
+                                    <h4 style={{ margin: 0, textAlign: "left",fontSize:'35px',fontWeight:'bold' }}>{price+" Dt"}</h4>
+                                    <br/>
+                                    <p style={{ textAlign: "left" }}>
+                                      {description}
+                                    </p>
+                                  </Grid>
+                                </Grid>
+                              </Paper>
+                        </div>
+                        <ListFeedbacksRatingsImages type={"Feedbacks"} front={"front"} formdata={dataindex}/>
+                      </Box>
+                      })()}
+                    </Typography>
+                  </Box>
+                </Modal>
+                <Modal
+                    open={opentwo}
+                    onClose={handleClosetwo}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                    BackdropComponent={Backdrop}
+                >
+                  <Box sx={styleratecomment}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                      Share your experiences with the product.
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                      {(() => {
+                        const {id_p}=dataadd
+                      return <form onSubmit={submit} >
+                      <Box
+                          sx={{
+                            width: 200,
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                      >
+                        <Rating
+                            name="hover-feedback"
+                            value={value}
+                            getLabelText={getLabelText}
+                            onChange={(event, newValue) => {
+                              setValue(newValue);
+                            }}
+                            onChangeActive={(event, newHover) => {
+                              setHover(newHover);
+                            }}
+                            emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+                        />
+                        {(
+                            <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover : value]}</Box>
+                        )}
+                      </Box>
+                        <Box
+                            component="form"
+                            sx={{
+                              '& .MuiTextField-root': { m: 1, width: '25ch',marginTop:'20px' },
+                            }}
+                            noValidate
+                            autoComplete="off"
+                        >
+                          <TextField
+                              id="textcomment"
+                              label={user['name']}
+                              multiline
+                              maxRows={4}
+                              value={valuecomment}
+                              onChange={(event) => {
+                                setValuecomment(event.target.value);
+                              }}
+                          />
+
+                          <input hidden disabled type="text" name="id_p" value={id_p} onChange={(event) => {
+                            setDataadd({id_p:event.target.value});
+                          }}  />
+                      </Box>
+                        <br/>
+                        <button className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150">Do it</button>
+                      </form>
+                      })()}
+                    </Typography>
+                    {msg}
+                    </Box>
+                </Modal>
+              </div>
+                  )}
+              <div className="flex flex-wrap items-center mt-32">
+
+                <div className="w-full md:w-5/12 px-4 mr-auto ml-auto">
+                  <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-white">
+                    <i className="fas fa-user-friends text-xl"></i>
                   </div>
-                </div>
-              </div>
-
-              <div className="pt-6 w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
-                  <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-emerald-400">
-                      <i className="fas fa-fingerprint"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Verified Company</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Write a few lines about each one. A paragraph describing a
-                      feature will be enough. Keep you user engaged!
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center mt-32">
-              <div className="w-full md:w-5/12 px-4 mr-auto ml-auto">
-                <div className="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-white">
-                  <i className="fas fa-user-friends text-xl"></i>
-                </div>
-                <h3 className="text-3xl mb-2 font-semibold leading-normal">
-                  Working with us is a pleasure
-                </h3>
-                <p className="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600">
-                  Don't let your uses guess by attaching tooltips and popoves to
-                  any element. Just make sure you enable them first via
-                  JavaScript.
-                </p>
-                <p className="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
-                  The kit comes with three pre-built pages to help you get
-                  started faster. You can change the text and images and you're
-                  good to go. Just make sure you enable them first via
-                  JavaScript.
-                </p>
-                <Link to="/" className="font-bold text-blueGray-700 mt-8">
-                  Check Notus React!
-                </Link>
-              </div>
-
-              <div className="w-full md:w-4/12 px-4 mr-auto ml-auto">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
-                  <img
-                    alt="..."
-                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
-                    className="w-full align-middle rounded-t-lg"
-                  />
-                  <blockquote className="relative p-8 mb-4">
-                    <svg
-                      preserveAspectRatio="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 583 95"
-                      className="absolute left-0 w-full block h-95-px -top-94-px"
-                    >
-                      <polygon
-                        points="-30,95 583,95 583,65"
-                        className="text-lightBlue-500 fill-current"
-                      ></polygon>
-                    </svg>
-                    <h4 className="text-xl font-bold text-white">
-                      Top Notch Services
-                    </h4>
-                    <p className="text-md font-light mt-2 text-white">
-                      The Arctic Ocean freezes every winter and much of the
-                      sea-ice then thaws every summer, and that process will
-                      continue whatever happens.
-                    </p>
-                  </blockquote>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="relative py-20">
-          <div
-            className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-            style={{ transform: "translateZ(0)" }}
-          >
-            <svg
-              className="absolute bottom-0 overflow-hidden"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="text-white fill-current"
-                points="2560 0 2560 100 0 100"
-              ></polygon>
-            </svg>
-          </div>
-
-          <div className="container mx-auto px-4">
-            <div className="items-center flex flex-wrap">
-              <div className="w-full md:w-4/12 ml-auto mr-auto px-4">
-                <img
-                  alt="..."
-                  className="max-w-full rounded-lg shadow-lg"
-                  src="https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
-                />
-              </div>
-              <div className="w-full md:w-5/12 ml-auto mr-auto px-4">
-                <div className="md:pr-12">
-                  <div className="text-lightBlue-600 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-lightBlue-300">
-                    <i className="fas fa-rocket text-xl"></i>
-                  </div>
-                  <h3 className="text-3xl font-semibold">A growing company</h3>
-                  <p className="mt-4 text-lg leading-relaxed text-blueGray-500">
-                    The extension comes with three pre-built pages to help you
-                    get started faster. You can change the text and images and
-                    you're good to go.
+                  <h3 className="text-3xl mb-2 font-semibold leading-normal">
+                    Working with us is a pleasure
+                  </h3>
+                  <p className="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600">
+                    Don't let your uses guess by attaching tooltips and popoves to
+                    any element. Just make sure you enable them first via
+                    JavaScript.
                   </p>
-                  <ul className="list-none mt-6">
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-lightBlue-600 bg-lightBlue-200 mr-3">
-                            <i className="fas fa-fingerprint"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-blueGray-500">
-                            Carefully crafted components
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-lightBlue-600 bg-lightBlue-200 mr-3">
-                            <i className="fab fa-html5"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-blueGray-500">
-                            Amazing page examples
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="flex items-center">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-lightBlue-600 bg-lightBlue-200 mr-3">
-                            <i className="far fa-paper-plane"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-blueGray-500">
-                            Dynamic components
-                          </h4>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+                  <p className="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
+                    The kit comes with three pre-built pages to help you get
+                    started faster. You can change the text and images and you're
+                    good to go. Just make sure you enable them first via
+                    JavaScript.
+                  </p>
+                  <Link to="/" className="font-bold text-blueGray-700 mt-8">
+                    Check Notus React!
+                  </Link>
                 </div>
+
+                <div className="w-full md:w-4/12 px-4 mr-auto ml-auto">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
+                    <img
+                        alt="..."
+                        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
+                        className="w-full align-middle rounded-t-lg"
+                    />
+                    <blockquote className="relative p-8 mb-4">
+                      <svg
+                          preserveAspectRatio="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 583 95"
+                          className="absolute left-0 w-full block h-95-px -top-94-px"
+                      >
+                        <polygon
+                            points="-30,95 583,95 583,65"
+                            className="text-lightBlue-500 fill-current"
+                        ></polygon>
+                      </svg>
+                      <h4 className="text-xl font-bold text-white">
+                        Top Notch Services
+                      </h4>
+                      <p className="text-md font-light mt-2 text-white">
+                        The Arctic Ocean freezes every winter and much of the
+                        sea-ice then thaws every summer, and that process will
+                        continue whatever happens.
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+
               </div>
+
             </div>
+
+
+
           </div>
         </section>
 
-        <section className="pt-20 pb-48">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-wrap justify-center text-center mb-24">
-              <div className="w-full lg:w-6/12 px-4">
-                <h2 className="text-4xl font-semibold">Here are our heroes</h2>
-                <p className="text-lg leading-relaxed m-4 text-blueGray-500">
-                  According to the National Oceanic and Atmospheric
-                  Administration, Ted, Scambos, NSIDClead scentist, puts the
-                  potentially record maximum.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap">
-              <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                <div className="px-6">
-                  <img
-                    alt="..."
-                    src={require("assets/img/team-1-800x800.jpg").default}
-                    className="shadow-lg rounded-full mx-auto max-w-120-px"
-                  />
-                  <div className="pt-6 text-center">
-                    <h5 className="text-xl font-bold">Ryan Tompson</h5>
-                    <p className="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                      Web Developer
-                    </p>
-                    <div className="mt-6">
-                      <button
-                        className="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-twitter"></i>
-                      </button>
-                      <button
-                        className="bg-lightBlue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-facebook-f"></i>
-                      </button>
-                      <button
-                        className="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-dribbble"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                <div className="px-6">
-                  <img
-                    alt="..."
-                    src={require("assets/img/team-2-800x800.jpg").default}
-                    className="shadow-lg rounded-full mx-auto max-w-120-px"
-                  />
-                  <div className="pt-6 text-center">
-                    <h5 className="text-xl font-bold">Romina Hadid</h5>
-                    <p className="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                      Marketing Specialist
-                    </p>
-                    <div className="mt-6">
-                      <button
-                        className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-google"></i>
-                      </button>
-                      <button
-                        className="bg-lightBlue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-facebook-f"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                <div className="px-6">
-                  <img
-                    alt="..."
-                    src={require("assets/img/team-3-800x800.jpg").default}
-                    className="shadow-lg rounded-full mx-auto max-w-120-px"
-                  />
-                  <div className="pt-6 text-center">
-                    <h5 className="text-xl font-bold">Alexa Smith</h5>
-                    <p className="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                      UI/UX Designer
-                    </p>
-                    <div className="mt-6">
-                      <button
-                        className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-google"></i>
-                      </button>
-                      <button
-                        className="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-twitter"></i>
-                      </button>
-                      <button
-                        className="bg-blueGray-700 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-instagram"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                <div className="px-6">
-                  <img
-                    alt="..."
-                    src={require("assets/img/team-4-470x470.png").default}
-                    className="shadow-lg rounded-full mx-auto max-w-120-px"
-                  />
-                  <div className="pt-6 text-center">
-                    <h5 className="text-xl font-bold">Jenna Kardi</h5>
-                    <p className="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                      Founder and CEO
-                    </p>
-                    <div className="mt-6">
-                      <button
-                        className="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-dribbble"></i>
-                      </button>
-                      <button
-                        className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-google"></i>
-                      </button>
-                      <button
-                        className="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-twitter"></i>
-                      </button>
-                      <button
-                        className="bg-blueGray-700 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                        type="button"
-                      >
-                        <i className="fab fa-instagram"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="pb-20 relative block bg-blueGray-800">
-          <div
-            className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-            style={{ transform: "translateZ(0)" }}
-          >
-            <svg
-              className="absolute bottom-0 overflow-hidden"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="text-blueGray-800 fill-current"
-                points="2560 0 2560 100 0 100"
-              ></polygon>
-            </svg>
-          </div>
-
-          <div className="container mx-auto px-4 lg:pt-24 lg:pb-64">
-            <div className="flex flex-wrap text-center justify-center">
-              <div className="w-full lg:w-6/12 px-4">
-                <h2 className="text-4xl font-semibold text-white">
-                  Build something
-                </h2>
-                <p className="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">
-                  Put the potentially record low maximum sea ice extent tihs
-                  year down to low ice. According to the National Oceanic and
-                  Atmospheric Administration, Ted, Scambos.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap mt-12 justify-center">
-              <div className="w-full lg:w-3/12 px-4 text-center">
-                <div className="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
-                  <i className="fas fa-medal text-xl"></i>
-                </div>
-                <h6 className="text-xl mt-5 font-semibold text-white">
-                  Excelent Services
-                </h6>
-                <p className="mt-2 mb-4 text-blueGray-400">
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-                </p>
-              </div>
-              <div className="w-full lg:w-3/12 px-4 text-center">
-                <div className="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
-                  <i className="fas fa-poll text-xl"></i>
-                </div>
-                <h5 className="text-xl mt-5 font-semibold text-white">
-                  Grow your market
-                </h5>
-                <p className="mt-2 mb-4 text-blueGray-400">
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-                </p>
-              </div>
-              <div className="w-full lg:w-3/12 px-4 text-center">
-                <div className="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
-                  <i className="fas fa-lightbulb text-xl"></i>
-                </div>
-                <h5 className="text-xl mt-5 font-semibold text-white">
-                  Launch time
-                </h5>
-                <p className="mt-2 mb-4 text-blueGray-400">
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className="relative block py-24 lg:pt-0 bg-blueGray-800">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-wrap justify-center lg:-mt-64 -mt-48">
-              <div className="w-full lg:w-6/12 px-4">
-                <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
-                  <div className="flex-auto p-5 lg:p-10">
-                    <h4 className="text-2xl font-semibold">
-                      Want to work with us?
-                    </h4>
-                    <p className="leading-relaxed mt-1 mb-4 text-blueGray-500">
-                      Complete this form and we will get back to you in 24
-                      hours.
-                    </p>
-                    <div className="relative w-full mb-3 mt-8">
-                      <label
-                        className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                        htmlFor="full-name"
-                      >
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                        placeholder="Full Name"
-                      />
-                    </div>
-
-                    <div className="relative w-full mb-3">
-                      <label
-                        className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                        htmlFor="email"
-                      >
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                        placeholder="Email"
-                      />
-                    </div>
-
-                    <div className="relative w-full mb-3">
-                      <label
-                        className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                        htmlFor="message"
-                      >
-                        Message
-                      </label>
-                      <textarea
-                        rows="4"
-                        cols="80"
-                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-                        placeholder="Type a message..."
-                      />
-                    </div>
-                    <div className="text-center mt-6">
-                      <button
-                        className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                      >
-                        Send Message
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </>
