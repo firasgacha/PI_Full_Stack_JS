@@ -46,7 +46,6 @@ export default function SendComplaint () {
     const formData = new FormData();
     formData.append("file", selectedImage);
     formData.append("upload_preset", "qysdlxzm");
-
     axios.post(
       "https://api.cloudinary.com/v1_1/du8mkgw6r/image/upload",
       formData,

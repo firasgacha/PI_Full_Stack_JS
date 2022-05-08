@@ -37,6 +37,9 @@ export default function HomePage() {
       <br />
       <Contact show={false} />
       <Footer />
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.2/dist/full.css" rel="stylesheet" type="text/css" />
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+      <script src="../path/to/flowbite/dist/flowbite.js"></script>
     </>
   )
 }
