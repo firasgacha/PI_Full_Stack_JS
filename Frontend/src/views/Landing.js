@@ -513,8 +513,8 @@ export default function Landing() {
                           {multi_files.map((item) => (
                               <ImageListItem key={item.img}>
                                 <img
-                                    src={"http://localhost:5000/images/"+`${item.img}?w=248&fit=crop&auto=format`}
-                                    srcSet={"http://localhost:5000/images/"+`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                    src={`${item.img}?w=248&fit=crop&auto=format`}
+                                    srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
                                     alt={item.title}
                                     loading="lazy"
                                 />

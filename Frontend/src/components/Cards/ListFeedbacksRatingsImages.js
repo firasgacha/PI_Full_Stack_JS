@@ -114,7 +114,7 @@ export default function ListFeedbacksRatingsImages(props){
             <h1>Photos</h1>{
             multi_files.map((img,index) =>
                 <Paper key={index} style={{ padding: "40px 20px", marginTop: 20 }}>
-                <img key={index} id="taswira" src={"http://localhost:5000/images/"+img.img}
+                <img key={index} id="taswira" src={img.img}
                      className="bg-white"/>
                 </Paper>
             )}
