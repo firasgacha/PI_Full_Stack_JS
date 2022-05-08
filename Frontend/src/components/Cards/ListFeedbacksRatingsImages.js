@@ -35,7 +35,7 @@ export default function ListFeedbacksRatingsImages(props){
         }
     },[dispatch,isLogged])
 
-    console.log(users);
+    // console.log(users);
     const [type] = useState(props.type);
     const [formdata] = useState(props.formdata);
     let ret;
