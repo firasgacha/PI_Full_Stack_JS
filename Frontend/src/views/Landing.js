@@ -477,7 +477,7 @@ export default function Landing() {
                               else
                                 return <>
                                   <Button  style={{outline:"none"}} size="small" disabled>Rate / Leave your Comment</Button>
-                                  <Button  style={{outline:"none"}} size="small" disabled>Add to list</Button>
+                                  <Button  style={{outline:"none"}} size="small">Add to list</Button>
                                 </>
                             })()}
                             </>
