@@ -30,7 +30,7 @@ export default function ModalChat(props) {
   }, [props.onOFF]);
   return (
     <div>
-      <Button onClick={handleOpen} disabled={onOFF}>Open Chat</Button>
+      <button class="btn btn-ghost"onClick={handleOpen} disabled={onOFF}>Open Chat</button>
       <Modal
         open={open}
         onClose={handleClose}

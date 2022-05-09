@@ -168,7 +168,7 @@ export default function GetComplaintsData() {
                     {item.status === 'Open' ? <i className="fas fa-circle text-emerald-500 mr-2"></i> : <i className="fas fa-circle text-red-500 mr-2"></i>}
                     {item.status}
                     {/* <button onClick={() => ChangeStatus(item._id,item.status)}>Change Status</button> */}
-                    <Button onClick={() => ChangeStatus(item._id, item.status)}>Change Status</Button>
+                    {/* <Button onClick={() => ChangeStatus(item._id, item.status)}>Change Status</Button> */}
                   </td>
                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                     {item.createdAt.toString().substring(0, 10)}
@@ -180,7 +180,8 @@ export default function GetComplaintsData() {
                     <ModalChat onOFF={item.status} onClick={GetComplaintsData} userName={userName} complId={item._id} msgs={item.msgs} refresh={GetComplaintsData} />
                   </td>
                   <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                    <TableDropdown />
+                    {/* <TableDropdown /> */}
+                    <button class="btn btn-warning" onClick={() => ChangeStatus(item._id, item.status)}>Close Complaint</button>
                   </th>
                 </tr>
               )}

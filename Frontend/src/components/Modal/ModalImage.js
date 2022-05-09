@@ -28,7 +28,7 @@ export default function ModalImage(props) {
     return (
         <div>
             {props.image ? 
-            <Button className='btn btn-red' onClick={handleOpen}><ImageIcon/> Screenshot</Button> : 
+            <button class='btn text-white' onClick={handleOpen}><ImageIcon/> Screenshot</button> : 
             <Button disabled>No image uploaded</Button>}
             <Modal
                 open={open}
