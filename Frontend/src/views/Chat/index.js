@@ -5,8 +5,9 @@ import Message from "./message";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import OlderMessages from "./OlderMessages";
-import { socket } from "../../socket";
+// import { socket } from "../../socket";
 import GifPopUp from "./GifPopUp";
+import io from "socket.io-client";
 
 const otherInit = {
 	_id: "",
@@ -20,15 +21,28 @@ export default function Chat() {
 	const [chatInfo, setChatInfo] = useState({});
 	const [messageList, setMessageList] = useState([]);
 	const [other, setOther] = useState(otherInit);
-	const [gif, setGif] = useState(false);
 	const msgText = useRef(null);
-	const messages = useRef(null);
+	const messages = useRef();
+	const [socket, setSocket] = useState(null);
 
-	socket.on("message", (message) => {
-		console.log(message);
-		setMessageList((messageList) => [...messageList, message]);
-		messages.current.scrollTop = messages.current.scrollHeight;
-	});
+	useEffect(() => {
+		const newSocket = io.connect("ws://localhost:5000");
+		setSocket(newSocket);
+
+		return () => {
+			socket.emit("leaveRoom");
+			socket.disconnect();
+		};
+	}, []);
+
+	useEffect(() => {
+		if (socket) {
+			socket.on("message", (message) => {
+				setMessageList((messageList) => [...messageList, message]);
+				messages.current.scrollTop = messages.current.scrollHeight;
+			});
+		}
+	}, [socket]);
 
 	useEffect(() => {
 		const fetchData = async (id) => {
@@ -38,24 +52,24 @@ export default function Chat() {
 				setMessageList(data.data.messages);
 			});
 
-			messages.current.value = messageList.map((message) => Message(message));
-			messages.current.scrollTop = messages.current.scrollHeight;
+			if (messages && messages.current) {
+				messages.current.value = messageList.map((message) => Message(message));
+				messages.current.scrollTop = messages.current.scrollHeight;
+			}
 		};
 		fetchData(id);
-		return () => {
-			socket.emit("leaveRoom");
-			socket.disconnect();
-		};
-	}, [id]);
+	}, [id, messages]);
 
 	useEffect(() => {
-		const joinRoom = (user, id) => {
-			socket.emit("joinRoom", { userId: user._id, room: id });
-		};
-		if (user) {
-			joinRoom(user, id);
+		if (socket) {
+			const joinRoom = (user, id) => {
+				socket.emit("joinRoom", { userId: user._id, room: id });
+			};
+			if (user) {
+				joinRoom(user, id);
+			}
 		}
-	}, [id, user]);
+	}, [id, user, socket]);
 
 	useEffect(() => {
 		if (chatInfo.user1Info) {
