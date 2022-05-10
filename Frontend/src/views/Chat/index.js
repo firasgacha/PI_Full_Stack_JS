@@ -6,6 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import OlderMessages from "./OlderMessages";
 import { socket } from "../../socket";
+import GifPopUp from "./GifPopUp";
 
 const otherInit = {
 	_id: "",
@@ -19,6 +20,7 @@ export default function Chat() {
 	const [chatInfo, setChatInfo] = useState({});
 	const [messageList, setMessageList] = useState([]);
 	const [other, setOther] = useState(otherInit);
+	const [gif, setGif] = useState(false);
 	const msgText = useRef(null);
 	const messages = useRef(null);
 
@@ -132,6 +134,7 @@ export default function Chat() {
 						<button type="submit" className={chatStyle.btn}>
 							<i className="fas fa-paper-plane"></i> Send
 						</button>
+						<GifPopUp id={id} socket={socket} />
 					</form>
 				</div>
 			</div>

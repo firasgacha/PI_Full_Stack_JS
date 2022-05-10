@@ -8,7 +8,7 @@ const store = new mongoose.Schema(
 			ref: "user",
 			required: true,
 		},
-		profileImage: { type: String, default: "defaultStorePic.png" },
+		profileImage: { type: String, default: "" },
 		coverImage: { type: String, default: "defaultCoverPic.png" },
 		description: { type: String, default: "No description" },
 		address: { type: String, default: "No address" },
@@ -20,6 +20,7 @@ const store = new mongoose.Schema(
 			instagram: { type: String, default: "No instagram" },
 			twitter: { type: String, default: "No twitter" },
 		},
+		verified: { type: Boolean, default: false },
 		followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
 		stats: {
 			productSales: { type: Number, default: 0 },
@@ -28,7 +29,7 @@ const store = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
-var str = mongoose.model("store", store);
+var str = mongoose.model("Store", store);
 module.exports = {
 	Store: str,
 	Storeschema: store,

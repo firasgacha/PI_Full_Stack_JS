@@ -56,10 +56,33 @@ module.exports = {
 		}
 	},
 	updateStore: (req, res) => {
-		const newStore = new Store(req.body);
+		console.log(req.body);
+		const {
+			fullName,
+			profileImage,
+			description,
+			address,
+			phone,
+			email,
+			website,
+			facebook,
+			instagram,
+			twitter,
+		} = req.body;
 		try {
-			Store.findByIdAndUpdate(req.params.id, newStore, {
-				useFindAndModify: true,
+			Store.findByIdAndUpdate(req.params.id, {
+				fullName,
+				profileImage,
+				description,
+				address,
+				phone,
+				email,
+				contact: {
+					website,
+					facebook,
+					instagram,
+					twitter,
+				},
 			}).then((store) => {
 				res.json(store);
 			});
@@ -76,6 +99,14 @@ module.exports = {
 			Store.findByIdAndDelete({ _id: req.params.id }).then((store) =>
 				res.json(store)
 			);
+		} catch (error) {
+			res.status(400).json({ message: error.message });
+		}
+	},
+	verifyStore: async (req, res) => {
+		try {
+			await Store.updateOne({ _id: req.params.id }, { verified: true });
+			res.json("Store Verified");
 		} catch (error) {
 			res.status(400).json({ message: error.message });
 		}

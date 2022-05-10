@@ -7,12 +7,11 @@ import axios from "axios";
 
 const StoreInfoInit = {
 	fullName: "Joe Store",
-	profileImage: "defaultStorePic.png",
-	coverImage: "defaultCoverPic.png",
 	description: "No description",
 	address: "No address",
 	phone: "No phone",
 	email: "No email",
+	verified: false,
 	contact: {
 		website: "No website",
 		facebook: "No facebook",
@@ -23,23 +22,102 @@ const StoreInfoInit = {
 	createdAt: "",
 };
 
+const products = [];
+let editInput = {};
+
 export default function Store() {
 	const { id } = useParams();
-	const auth = useSelector((state) => state.auth);
 	const navigate = useHistory();
-
 	const [StoreInfo, setStoreInfo] = useState(StoreInfoInit);
-	const { user, isAdmin } = auth;
+	const [edit, setEdit] = useState(false);
+	const [image, setImage] = useState(
+		"https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+	);
+	const { user, isAdmin } = useSelector((state) => state.auth);
+
+	const editInfo = () => {
+		editInput = {
+			fullName: StoreInfo.fullName,
+			description: StoreInfo.description,
+			address: StoreInfo.address,
+			phone: StoreInfo.phone,
+			email: StoreInfo.email,
+			website: StoreInfo.contact.website,
+			facebook: StoreInfo.contact.facebook,
+			instagram: StoreInfo.contact.instagram,
+			twitter: StoreInfo.contact.twitter,
+		};
+
+		console.log(StoreInfo, editInput);
+		setEdit(true);
+	};
+
+	const submitInfo = async () => {
+		const payload = {
+			fullName: editInput.fullName,
+			profileImage: image,
+			description: editInput.description,
+			address: editInput.address,
+			phone: editInput.phone,
+			email: editInput.email,
+			website: editInput.website,
+			facebook: editInput.facebook,
+			instagram: editInput.instagram,
+			twitter: editInput.twitter,
+		};
+
+		await axios.patch(`/store/api/${id}`, payload).then((res) => {
+			console.log(res.data);
+		});
+
+		setEdit(false);
+
+		setStoreInfo((StoreInfo) => {
+			return {
+				...StoreInfo,
+				fullName: editInput.fullName,
+				description: editInput.description,
+				address: editInput.address,
+				phone: editInput.phone,
+				email: editInput.email,
+				contact: {
+					website: editInput.website,
+					facebook: editInput.facebook,
+					instagram: editInput.instagram,
+					twitter: editInput.twitter,
+				},
+			};
+		});
+	};
+
+	const changeAvatar = async (e) => {
+		const file = e.target.files[0];
+		const formData = new FormData();
+		formData.append("file", file);
+		formData.append("upload_preset", "qysdlxzm");
+
+		axios
+			.post("https://api.cloudinary.com/v1_1/du8mkgw6r/image/upload", formData)
+			.then((response) => {
+				console.log(response);
+				const result = response.data;
+				setImage(result.secure_url);
+			});
+	};
 
 	useEffect(() => {
-		axios.get(`/store/${id}`).then((res) => {
+		axios.get(`/store/api/${id}`).then((res) => {
 			if (res.data == null) {
 				console.log("No store found");
 				return;
 			}
 			res.data.createdAt = res.data.createdAt.slice(0, 10);
 			setStoreInfo(res.data);
+			if (res.data.profileImage) {
+				setImage(res.data.profileImage);
+			}
 		});
+		// get all products here
 	}, [id]);
 
 	const startChat = () => {
@@ -68,176 +146,167 @@ export default function Store() {
 									<div className="w-36 h-36 relative m-4 rounded bg-white">
 										<img
 											alt="..."
-											src={"../../src/assets/img/" + StoreInfo.coverImage}
-											className="w-full h-full object-cover display-block bg-white"
+											src={image}
+											className="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-12 lg:-ml-20 max-w-150-px min-w-140-px"
 										/>
 									</div>
 								</div>
 
-								<div className="w-100 mb-12 flex flex-row justify-between">
-									<div className="px-5 text-xl">
-										<h1>{StoreInfo.fullName}</h1>
-										<h2>{StoreInfo.description}</h2>
-										<h3>Since {StoreInfo.createdAt}</h3>
+								{edit ? (
+									<div className="flex flex-wrap justify-center">
+										<input
+											type="text"
+											defaultValue={editInput.fullName}
+											onInput={(e) => {
+												editInput.fullName = e.target.value;
+											}}
+										/>
+										<label htmlFor="file_up" className="cursor-pointer ml-1">
+											Change Profile Picture
+										</label>
+										<input
+											type="file"
+											name="file"
+											id="file_up"
+											className="hidden"
+											onChange={changeAvatar}
+										/>
+										<input
+											type="text"
+											placeholder="Description"
+											defaultValue={editInput.description}
+											onChange={(e) => {
+												editInput.description = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Address"
+											defaultValue={editInput.address}
+											onChange={(e) => {
+												editInput.address = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Phone"
+											defaultValue={editInput.phone}
+											onChange={(e) => {
+												editInput.phone = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Email"
+											defaultValue={editInput.email}
+											onChange={(e) => {
+												editInput.email = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Website"
+											defaultValue={editInput.website}
+											onChange={(e) => {
+												editInput.website = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Facebook"
+											defaultValue={editInput.facebook}
+											onChange={(e) => {
+												editInput.facebook = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Instagram"
+											defaultValue={editInput.instagram}
+											onChange={(e) => {
+												editInput.instagram = e.target.value;
+											}}
+										/>
+										<input
+											type="text"
+											placeholder="Twitter"
+											defaultValue={editInput.twitter}
+											onChange={(e) => {
+												editInput.twitter = e.target.value;
+											}}
+										/>
+										<button onClick={submitInfo}>Submit</button>
 									</div>
-									<div className="">
-										<h2 className="mx-auto text-xl">Info :</h2>
-										<ul>
-											<li>
-												<b>Website: </b>
-												{StoreInfo.contact.website}
-											</li>
-											<li>
-												<b>email: </b>
-												{StoreInfo.email}
-											</li>
-											<li>
-												<b>facebook: </b>
+								) : (
+									<div className="w-100 mb-12 flex flex-row justify-between">
+										<div className="px-5 text-xl">
+											<h1>{StoreInfo.fullName}</h1>
+											{StoreInfo.verified ? (
+												<i className="verified text-blue-600"></i>
+											) : (
+												""
+											)}
+											<h2>{StoreInfo.description}</h2>
+											<h3>Since {StoreInfo.createdAt}</h3>
+										</div>
+										<div className="">
+											<h2 className="mx-auto text-xl">Info :</h2>
+											<ul>
+												<li>
+													<b>Website: </b>
+													{StoreInfo.contact.website}
+												</li>
+												<li>
+													<b>email: </b>
+													{StoreInfo.email}
+												</li>
+												<li>
+													<b>facebook: </b>
 
-												{StoreInfo.contact.facebook}
-											</li>
-											<li>
-												<b>instagram: </b>
+													{StoreInfo.contact.facebook}
+												</li>
+												<li>
+													<b>instagram: </b>
 
-												{StoreInfo.contact.instagram}
-											</li>
-											<li>
-												<button
-													className="bg-white text-lightBlue-400 shadow-lg font-normal h-20 w-20 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+													{StoreInfo.contact.instagram}
+												</li>
+												<li>
+													{user._id === StoreInfo.owner ? (
+														<button
+															onClick={editInfo}
+															className="bg-white text-lightBlue-400 shadow-lg font-normal h-20 w-20 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+														>
+															Edit
+														</button>
+													) : (
+														<button
+															onClick={startChat}
+															className="bg-white text-lightBlue-400 shadow-lg font-normal h-20 w-20 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+														>
+															Start Chat
+														</button>
+													)}
+													{/* <button
 													onClick={startChat}
 												>
 													Chat With
-												</button>
-											</li>
-										</ul>
+												</button> */}
+												</li>
+											</ul>
+										</div>
 									</div>
-								</div>
+								)}
 							</div>
 							<h1 className="text-center text-lg mb-5">
 								{" "}
 								{StoreInfo.fullName}'s Products :
 							</h1>
 							<div className="flex flex-row justify-evenly">
-								<div className="md:w-4/12 px-4 ">
-									<div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
-										<img
-											alt="..."
-											src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
-											className="w-full align-middle rounded-t-lg"
-										/>
-										<blockquote className="relative p-8 mb-4">
-											<svg
-												preserveAspectRatio="none"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 583 95"
-												className="absolute left-0 w-full block h-95-px -top-94-px"
-											>
-												<polygon
-													points="-30,95 583,95 583,65"
-													className="text-lightBlue-500 fill-current"
-												></polygon>
-											</svg>
-											<h4 className="text-xl font-bold text-white">
-												Top Notch Services
-											</h4>
-											<p className="text-md font-light mt-2 text-white">
-												The Arctic Ocean freezes every winter and much of the
-												sea-ice then thaws every summer, and that process will
-												continue whatever happens.
-											</p>
-										</blockquote>
-									</div>
-								</div>
-								<div className="md:w-4/12 px-4">
-									<div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
-										<img
-											alt="..."
-											src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
-											className="w-full align-middle rounded-t-lg"
-										/>
-										<blockquote className="relative p-8 mb-4">
-											<svg
-												preserveAspectRatio="none"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 583 95"
-												className="absolute left-0 w-full block h-95-px -top-94-px"
-											>
-												<polygon
-													points="-30,95 583,95 583,65"
-													className="text-lightBlue-500 fill-current"
-												></polygon>
-											</svg>
-											<h4 className="text-xl font-bold text-white">
-												Top Notch Services
-											</h4>
-											<p className="text-md font-light mt-2 text-white">
-												The Arctic Ocean freezes every winter and much of the
-												sea-ice then thaws every summer, and that process will
-												continue whatever happens.
-											</p>
-										</blockquote>
-									</div>
-								</div>
-								<div className="md:w-4/12 px-4">
-									<div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
-										<img
-											alt="..."
-											src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
-											className="w-full align-middle rounded-t-lg"
-										/>
-										<blockquote className="relative p-8 mb-4">
-											<svg
-												preserveAspectRatio="none"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 583 95"
-												className="absolute left-0 w-full block h-95-px -top-94-px"
-											>
-												<polygon
-													points="-30,95 583,95 583,65"
-													className="text-lightBlue-500 fill-current"
-												></polygon>
-											</svg>
-											<h4 className="text-xl font-bold text-white">
-												Top Notch Services
-											</h4>
-											<p className="text-md font-light mt-2 text-white">
-												The Arctic Ocean freezes every winter and much of the
-												sea-ice then thaws every summer, and that process will
-												continue whatever happens.
-											</p>
-										</blockquote>
-									</div>
-								</div>
-								<div className="md:w-4/12 px-4">
-									<div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
-										<img
-											alt="..."
-											src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
-											className="w-full align-middle rounded-t-lg"
-										/>
-										<blockquote className="relative p-8 mb-4">
-											<svg
-												preserveAspectRatio="none"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 583 95"
-												className="absolute left-0 w-full block h-95-px -top-94-px"
-											>
-												<polygon
-													points="-30,95 583,95 583,65"
-													className="text-lightBlue-500 fill-current"
-												></polygon>
-											</svg>
-											<h4 className="text-xl font-bold text-white">
-												Top Notch Services
-											</h4>
-											<p className="text-md font-light mt-2 text-white">
-												The Arctic Ocean freezes every winter and much of the
-												sea-ice then thaws every summer, and that process will
-												continue whatever happens.
-											</p>
-										</blockquote>
-									</div>
-								</div>
+								{products.map((product) => (
+									<p key={product._id} className="text-center text-lg mb-5">
+										{product.name}
+									</p>
+								))}
 							</div>
 						</div>
 					</div>

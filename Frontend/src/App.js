@@ -26,18 +26,15 @@ import MyComplaints from "./views/complaint/MyComplaints";
 import Store from "./views/Store";
 import MyStores from "./views/MyStores";
 import SendMessage from "./views/messages/SendMessage";
-<<<<<<< HEAD
 import Contact from "./views/contactUs/Contact";
 import HomePage from "./views/HomePage";
-=======
 import Chat from "views/Chat";
->>>>>>> chat-realtime
 
 function App() {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.token);
 	const auth = useSelector((state) => state.auth);
-	const {isAdmin}= auth;
+	const { isAdmin } = auth;
 
 	useEffect(() => {
 		const firstLogin = localStorage.getItem("firstLogin");

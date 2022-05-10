@@ -11,6 +11,7 @@ function Message(props) {
 				{props.message.sender === props.user._id ? "Me" : props.other.name}
 			</div>
 			<div className={chatStyle.messageText}>{props.message.content}</div>
+			<img src={props.message.image} alt="gif" />
 		</div>
 	);
 }

@@ -3,13 +3,15 @@ import Footer from "components/Footers/Footer.js";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Store() {
+	const { user, isAdmin } = useSelector((state) => state.auth);
 	const { id } = useParams();
 	const [StoreInfo, setStoreInfo] = useState([]);
 
 	useEffect(() => {
-		axios.get(`/store/owner/${id}`).then((res) => {
+		axios.get(`/store/api/owner/${id}`).then((res) => {
 			if (res.data) {
 				res.data.map((el) => (el.createdAt = el.createdAt.slice(0, 10)));
 				setStoreInfo(res.data);
@@ -26,7 +28,15 @@ export default function Store() {
 							<div className="px-6">
 								<div className="flex flex-wrap justify-center">
 									<div className="w-36 h-36 relative m-4 rounded bg-white">
-										<h1 className="text-xl">Your Stores:</h1>
+										{user?._id ? (
+											user._id === id ? (
+												<h1 className="text-xl">Your Stores:</h1>
+											) : (
+												<h1 className="text-xl">{user.name} Stores:</h1>
+											)
+										) : (
+											<h1 className="text-xl">Stores:</h1>
+										)}
 									</div>
 								</div>
 								<div className="flex flex-row justify-evenly">

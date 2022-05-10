@@ -29,10 +29,7 @@
     "nodemon": "^2.0.15",
     "process": "^0.11.10",
     "pug": "2.0.0-beta11",
-<<<<<<< HEAD
-=======
     "socket.io": "^4.5.0",
->>>>>>> chat-realtime
     "twig": "^1.15.4"
   }
 }

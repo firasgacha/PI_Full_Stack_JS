@@ -22,9 +22,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
- app.use(fileUpload({
-   useTempFiles: true
- }))
+app.use(
+	fileUpload({
+		useTempFiles: true,
+	})
+);
 
 // Routes
 app.use("/user", require("./routes/userRouter"));
@@ -33,7 +35,7 @@ app.use("/products", productsRouter);
 app.use("/ratings", ratingsRouter);
 app.use("/feedbacks", feedbacksRouter);
 app.use("/complaint", Complaint);
-app.use("/store", require("./routes/store.router"));
+app.use("/store/api", require("./routes/store.router"));
 app.use("/chat", require("./routes/chat.router"));
 
 //Connect to mongodb
