@@ -29,13 +29,10 @@ import SendMessage from "./views/messages/SendMessage";
 import Contact from "./views/contactUs/Contact";
 import Translate from "./components/Translate/Translate";
 import HomePage from "./views/HomePage";
+import Chat from "views/Chat";
 import IdentityVerif from "./views/IdentityVerif";
 
-
-
 function App() {
-
-
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.token);
 	const auth = useSelector((state) => state.auth);
@@ -91,6 +88,7 @@ function App() {
 					/>
 					<Route path="/landing" exact component={Landing} />
 					<Route path="/store/:id" exact component={Store} />
+					<Route path="/chats/:id" exact component={isLogged ? Chat : Auth} />
 					<Route path="/user-stores/:id" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
 					<Route path="/" exact component={HomePage} />

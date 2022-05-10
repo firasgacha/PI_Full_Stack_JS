@@ -8,6 +8,7 @@ exports.getfeedbacksjson=async function (request, result) {
         result.json(d_feedback)
     });
 }
+
 exports.getfeedbacks=async function (request, result) {
     Feedback.find(function (error,d_feedback){
         if(error)

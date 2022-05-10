@@ -1,10 +1,13 @@
 import React, {useState} from "react";
 import {queryApi} from "../../tools/queryApi";
+import {Alert} from "@mui/material";
+
 
 export default function AddModifyProduct(props){
     const [type, setType] = useState(props.type);
     const [formdata, setFormData] = useState(props.formdata);
     const [errors, setErrors] = useState({ visbile: false, message: "" });
+    const [show, setShow] = useState(false);
     const onChange = (e) => {
         setFormData({ ...formdata, [e.target.name]: e.target.value });
     };
@@ -16,29 +19,36 @@ export default function AddModifyProduct(props){
             setFormData({...formdata, multi_files: save_images});
         }
     };
+    let msg;
+    if(show)
+    msg=<Alert severity="success" onClose={() => setShow(false)} >
+        Hurray! You're a genius.
+    </Alert>
+
     const submit = async (e)=>{
         e.preventDefault();
         console.log(formdata);
         if(type=="Modify"){
-            const [, err] = await queryApi("update", formdata, "POST", true);
-            if (err) {
-                setErrors({
-                    visbile: true,
-                    message: JSON.stringify(err.errors, null, 2),
-                });
-            }else
-                window.location.reload(false);
-        }
-        else {
-            const [, err] = await queryApi("add", formdata, "POST", true);
+            const [, err] = await queryApi("products/update", formdata, "POST", true);
             if (err) {
                 setErrors({
                     visbile: true,
                     message: JSON.stringify(err.errors, null, 2),
                 });
             }
-            else
-                window.location.reload(false);
+            setShow(true)
+            setTimeout(()=>setShow(false),3000);
+        }
+        else {
+            const [, err] = await queryApi("products/add", formdata, "POST", true);
+            if (err) {
+                setErrors({
+                    visbile: true,
+                    message: JSON.stringify(err.errors, null, 2),
+                });
+            }
+            setShow(true)
+            setTimeout(()=>setShow(false),3000);
         }
     }
     let text_button;
@@ -52,7 +62,7 @@ export default function AddModifyProduct(props){
         p_button=<input accept='image/*' type="file" multiple onChange={(e) => onChangeFile(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"></input>
         text_button="Update";
     }
-    const {categorie, price, etat}=formdata
+    const {categorie, description,price, etat}=formdata
     return(
         <>
         <div className="text-blueGray-400 text-center mb-3 font-bold">
@@ -68,6 +78,15 @@ export default function AddModifyProduct(props){
                     </label>
                     <input name="categorie" value={categorie} type="text" placeholder="Product Category" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
                 </div>
+                <div className="form-group relative w-full mb-3" >
+                    <label
+                        className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                        htmlFor="grid-password"
+                    >
+                        Description
+                    </label>
+                    <input name="description" value={description} type="text" placeholder="Product Description" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
+                </div>
                 <div className="form-group relative w-full mb-3">
                     <label
                         className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
@@ -75,7 +94,7 @@ export default function AddModifyProduct(props){
                     >
                         Price Dt
                     </label>
-                    <input min="0" name="price" value={price} type="number" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
+                    <input min="1" name="price" value={price} type="number" onChange={(e) => onChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" required></input>
                 </div>
                 <div className="form-group relative w-full mb-3">
                     <label
@@ -97,6 +116,7 @@ export default function AddModifyProduct(props){
                 </div>
                 <button className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150">{text_button}</button>
             </form>
+            {msg}
         </>
     );
 
