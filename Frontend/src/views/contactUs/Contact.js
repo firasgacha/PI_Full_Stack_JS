@@ -10,10 +10,12 @@ export default function Contact(props) {
   const [phone, setPhone] = React.useState('');
   const [userId, setUserId] = React.useState('');
   const [show, setShow] = React.useState(true);
+
   useEffect(() => {
-    if (props.show==false) {
+    if (props.show == false) {
       setShow(false);
-    }} , []);
+    }
+  }, []);
   return (
     <>
       {show ? <Navbar transparent /> : null}
@@ -59,44 +61,26 @@ export default function Contact(props) {
       <section className="relative block py-24 lg:pt-0 bg-blueGray-800">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center lg:-mt-64 -mt-48">
-            <div className="w-full lg:w-4/12 px-4">
+            <div className="w-full lg:w-4/12 px-4 mt-20">
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Phone:<label className="text-blueGray-500 text-xs font-bold mb-2"> +216 22 333 444</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Email:<label className="text-blueGray-500 text-xs font-bold mb-2"> info@baazar.com</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Address:<label className="text-blueGray-500 text-xs font-bold mb-2"> Anywhere everywhere</label></label>
-                </div>
+                  <div className="flex flex-col w-full lg:flex-row">
+                    <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Phone:<label className="text-blueGray-500 text-xs font-bold mb-2"> +216 22 333 444</label></label>
+                  </div>
                 </div>
               </div>
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Phone:<label className="text-blueGray-500 text-xs font-bold mb-2"> +216 22 333 444</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Email:<label className="text-blueGray-500 text-xs font-bold mb-2"> info@baazar.com</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Address:<label className="text-blueGray-500 text-xs font-bold mb-2"> Anywhere everywhere</label></label>
-                </div>
+                  <div className="flex flex-col w-full lg:flex-row">
+                    <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Email:<label className="text-blueGray-500 text-xs font-bold mb-2"> info@baazar.com</label></label>
+                  </div>
                 </div>
               </div>
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Phone:<label className="text-blueGray-500 text-xs font-bold mb-2"> +216 22 333 444</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Email:<label className="text-blueGray-500 text-xs font-bold mb-2"> info@baazar.com</label></label>
-                </div>
-                <div className="flex flex-col w-full lg:flex-row">
-                <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Address:<label className="text-blueGray-500 text-xs font-bold mb-2"> Anywhere everywhere</label></label>
-                </div>
+                  <div className="flex flex-col w-full lg:flex-row">
+                    <label className="block uppercase text-blueGray-800 text-xs font-bold mb-2">Address:<label className="text-blueGray-500 text-xs font-bold mb-2"> Anywhere everywhere</label></label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -117,7 +101,7 @@ export default function Contact(props) {
                     <input
                       type="text"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Select Your Problem"
+                      placeholder="Your Name"
                       name="problemType"
                       onChange={(e) => setName(e.target.value)}
                     />
@@ -136,7 +120,7 @@ export default function Contact(props) {
                     <input
                       type="text"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Select Your Problem"
+                      placeholder="Your E-mail"
                       name="problemType"
                       // value={problemType}
                       onChange={(e) => setEmail(e.target.value)}
@@ -155,8 +139,8 @@ export default function Contact(props) {
                     <input
                       type="text"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Select Your Problem"
-                      name="problemType"
+                      placeholder="Your Phone"
+                      name="Your Phone"
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
@@ -181,8 +165,8 @@ export default function Contact(props) {
                   </div>
                   <div className="text-center">
                     <button
-                      className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                      type="submit"
+                      className="btn"
+                      type="reset"
                     >
                       Send
                     </button>
@@ -193,8 +177,8 @@ export default function Contact(props) {
             <div className="w-full lg:w-4/12 px-4">
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                 <img src="https://wwz.ifremer.fr/var/storage/images/_aliases/opengraphimage/medias-ifremer/medias-bluerevolution/contact-us/1811720-1-eng-GB/Contact-us.png" alt="" />
-                 <img src="https://www.newlightziwaschools.sc.ke/wp-content/uploads/2020/07/Contact-Us.png" alt="" />
+                  <img src="https://wwz.ifremer.fr/var/storage/images/_aliases/opengraphimage/medias-ifremer/medias-bluerevolution/contact-us/1811720-1-eng-GB/Contact-us.png" alt="" />
+                  <img src="https://www.newlightziwaschools.sc.ke/wp-content/uploads/2020/07/Contact-Us.png" alt="" />
                 </div>
               </div>
             </div>
