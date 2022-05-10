@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {dispatchGetAllUsers, fetchAllUsers} from "../../redux/actions/userActions";
 import axios from "axios";
+import Pagination from "../Pagination/Pagination";
 // components
 const initialState = {
   name: '',
@@ -14,18 +15,25 @@ const initialState = {
 }
 
 export default function CardPageVisits() {
-
   const auth = useSelector(state => state.auth)
   const token = useSelector(state => state.token)
   const users = useSelector(state => state.users)
 
-
+  const [value, setValue] = useState("");
   const{user, isAdmin} = auth
   const [data,setData] = useState(initialState)
   const [Loading,setLoading] = useState(false)
   const [callback , setCallback] = useState(false)
+  const [page, setPage] = useState(1)
+  const [pages, setPages] = useState(1)
+  const [Users, setUsers] = useState([])
+  const [error, setError] = useState(false)
+  var save=[];
+
+
 
   const dispatch = useDispatch()
+
   useEffect(() => {
     if(isAdmin){
       fetchAllUsers(token).then(res =>{
@@ -33,6 +41,28 @@ export default function CardPageVisits() {
       })
     }
   },[token, isAdmin, dispatch, callback])
+  useEffect(()=>{
+    const fetchAllUsers = async(token) =>{
+      setLoading(true)
+      try {
+        const res = await fetch(`/user/all_info?page=${page}`,{
+          headers: {Authorization: token}
+        })
+        const {data , pages: totalPages} = await res.json();
+        setPages(totalPages);
+        setUsers(data);
+        setLoading(false);
+
+      }catch(error) {
+        console.log(error)
+        setLoading(false);
+        setError('Some error occurred')
+      }
+    }
+    fetchAllUsers(token);
+  },[page])
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -51,6 +81,20 @@ export default function CardPageVisits() {
       setData({...data, err: err.response.data.msg , success: ''})
     }
   }
+
+
+  const handleChange = (event) => {
+    console.log(value)
+    setValue(event.target.value);
+
+  };
+  for (var i in Users)
+    if(Users[i]['name'].indexOf(value)!=-1 || Users[i]['email'].indexOf(value)!=-1 )
+      save.push(Users[i]);
+
+  if(value=="")
+    save=Users;
+
   return (
       <>
         <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
@@ -58,9 +102,11 @@ export default function CardPageVisits() {
             <div className="flex flex-wrap items-center">
               <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                 <h3 className="font-semibold text-base text-blueGray-700">
-                  Page visits
+                  Users List
                 </h3>
               </div>
+              <input type="text" id="search" placeholder="Search here" onChange={(e) =>handleChange(e)} className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
+
               <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
                 <button
                     className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -95,7 +141,7 @@ export default function CardPageVisits() {
               </thead>
               <tbody>
               {
-                users.map(user => (
+                save && save.map(user => (
                     <tr key={user._id}>
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left">
                         {user._id}
@@ -118,12 +164,14 @@ export default function CardPageVisits() {
                           <i className="fas fa-edit cursor-pointer" title="Edit"/>
                         </Link>
                         <i className="fas fa-trash-alt cursor-pointer" title="Remove"
-    onClick={() => handleDelete(user._id)} />
+                           onClick={() => handleDelete(user._id)} />
                       </td>
                     </tr>
                 ))
               }
+              <Pagination page={page} pages={pages} changePage={setPage}/>
               </tbody>
+              <tfoot></tfoot>
             </table>
           </div>
         </div>

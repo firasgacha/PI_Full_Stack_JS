@@ -227,13 +227,14 @@ export default function SendComplaint () {
                     />
                   </div>
                   <div className="text-center mt-6">
-                    <button
+                    {/* <button
                       className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="submit"
                       onClick={handleSubmite}
                     >
                       Send
-                    </button>
+                    </button> */}
+                    <button class="btn" onClick={handleSubmite}>Send</button>
                   </div>
                 </div>
               </div>

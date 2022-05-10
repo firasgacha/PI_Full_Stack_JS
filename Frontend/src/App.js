@@ -27,8 +27,10 @@ import Store from "./views/Store";
 import MyStores from "./views/MyStores";
 import SendMessage from "./views/messages/SendMessage";
 import Contact from "./views/contactUs/Contact";
+import Translate from "./components/Translate/Translate";
 import HomePage from "./views/HomePage";
 import Chat from "views/Chat";
+import IdentityVerif from "./views/IdentityVerif";
 
 function App() {
 	const dispatch = useDispatch();
@@ -70,10 +72,13 @@ function App() {
 					<Route path="/admin" component={isAdmin ? Admin : Index} />
 					<Route path="/auth" component={isLogged ? Index : Auth} />
 					{/* add routes without layouts */}
+					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/complaint" exact component={SendComplaint} />
 					<Route path="/message" exact component={SendMessage} />
 					<Route path="/Contact" exact component={Contact} />
 					<Route path="/mycomplaints" exact component={MyComplaints} />
+					<Route path="/IdentityVerif" exact component={IdentityVerif} />
+					<Route path="/translate" exact component={Translate} />
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/user/reset/:token" exact component={ResetPassword} />
 					<Route

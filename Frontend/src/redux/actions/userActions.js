@@ -2,7 +2,7 @@ import ACTIONS from './index'
 import axios from 'axios'
 
 export const fetchAllUsers = async (token) => {
-    const res = await axios.get('/user/all_info', {
+    const res = await axios.get('/user/all_inform', {
         headers: {Authorization: token}
     })
     return res

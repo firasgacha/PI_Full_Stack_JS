@@ -16,3 +16,4 @@ export const sendMessage = (id,msg) => axios.patch(`${url}/complaint/send_msg/${
 // export const fetchProductById = (id)=> axios.get(`${url}/products/${id}`);
 // export const smartFetchProduct = (pagination)=> axios.post(`${url}/products/page`, pagination);
 // export const getNbPages=()=> axios.get(`${url}/products/page/1`);
+export const getAllProducts = () => axios.get(`${url}/products/getjson`);
