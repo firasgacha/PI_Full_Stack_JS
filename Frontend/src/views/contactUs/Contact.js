@@ -1,15 +1,41 @@
-import React, { useEffect } from 'react';
-import Navbar from "components/Navbars/AuthNavbar.js";
+import React, { useState, useEffect} from 'react';
+// import Navbar from "components/Navbars/AuthNavbar.js";
+import Navbar from 'components/Navbars/IndexNavbar';
+import Alert from '../../components/Alert/Alert';
 import { Link } from 'react-router-dom';
+import * as api from '../../api/Api';
+import Footer from 'components/Footers/Footer';
 
 
 export default function Contact(props) {
-  const [description, setDescription] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [userId, setUserId] = React.useState('');
-  const [show, setShow] = React.useState(true);
+  const [description, setDescription] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [show, setShow] = useState(true);
+  const [color, setColor] = useState("");
+
+
+  const handleSubmite = () => {
+    const credentials = {name, email, phone, description};
+    api.sendContact(credentials)
+      .then(response => {
+        const result = response.data;
+        const { status, message, data } = result;
+        if (status !== 'SUCCESS') {
+          setColor("red");
+          setShow("yes");
+        }
+        else {
+          setColor("green");
+          setShow("yes");  
+          // window.location.reload()
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
   useEffect(() => {
     if (props.show == false) {
@@ -18,7 +44,8 @@ export default function Contact(props) {
   }, []);
   return (
     <>
-      {show ? <Navbar transparent /> : null}
+      {show ? <Navbar /> : null}
+      <br />
       <section className="pb-20 relative block bg-blueGray-800">
         <div
           className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
@@ -87,7 +114,7 @@ export default function Contact(props) {
             <div className="w-full lg:w-4/12 px-4">
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                  {/* <Alert message="Complaint Sended Successfully" backgroundColor={color} show={show} /> */}
+                  <Alert message="Complaint Sended Successfully" backgroundColor={color} show={show} />
                   <div className="relative w-full mb-3">
                     <label
                       className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
@@ -167,6 +194,7 @@ export default function Contact(props) {
                     <button
                       className="btn"
                       type="reset"
+                      onClick={handleSubmite}
                     >
                       Send
                     </button>
@@ -185,6 +213,8 @@ export default function Contact(props) {
           </div>
         </div>
       </section>
+      <Footer />
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.2/dist/full.css" rel="stylesheet" type="text/css" />
     </>
   )
 }

@@ -2,7 +2,6 @@ import React from 'react'
 import Navbar from '../components/Navbars/IndexNavbar';
 import Carousel from '../components/HomePage/Carousel';
 import Stats from '../components/HomePage/Stats';
-import Footer from '../components/Footers/Footer';
 import CarouselProducts from '../components/Product/CarouselProducts';
 import 'flowbite';
 import Contact from './contactUs/Contact';
@@ -37,7 +36,6 @@ export default function HomePage() {
       <PromoProducts />
       <br />
       <Contact show={false} />
-      <Footer />
       <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.2/dist/full.css" rel="stylesheet" type="text/css" />
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
       <script src="../path/to/flowbite/dist/flowbite.js"></script>
