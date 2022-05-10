@@ -6,7 +6,7 @@ import CarouselProducts from '../components/Product/CarouselProducts';
 import 'flowbite';
 import Contact from './contactUs/Contact';
 import PromoProducts from '../components/HomePage/PromoProducts';
-
+import DiveIn from '../components/HomePage/DiveIn';
 export default function HomePage() {
 
   return (
@@ -24,16 +24,31 @@ export default function HomePage() {
       <br />
       <CarouselProducts />
       <br />
-      <div class="carousel w-full">
-        <div id="item1" class="carousel-item w-full">
+      <div className="hero min-h-screen" style={{ backgroundImage: `url("https://api.lorem.space/image/fashion?w=1000&h=800")` }}>
+        <div className="hero-overlay bg-opacity-60"></div>
+        <div className="hero-content text-center text-neutral-content">
+          <div className="max-w-md">
+            <h1 className="mb-5 text-5xl font-bold">Hello there</h1>
+          </div>
+        </div>
+      </div>
+      <DiveIn/>
+      <div className="carousel w-full">
+        <div id="item1" className="carousel-item w-full">
           <img src="https://media.mytek.tn/media/webp_image/wysiwyg/banner/Avrl22/pc-portable-gamer-msi-1290-252px-2.webp" class="w-full" />
         </div>
       </div>
-      <br />
+      <div className="flex flex-col w-full border-opacity-50">
+        <div className="grid h-20 card bg-primary rounded-box place-items-center">
+          <p className='text-white'>Baazar is powered by 100% renewable electricity.</p>
+        </div>
+      </div>
       <Stats />
       <br />
       <br />
       <PromoProducts />
+      <br />
+      <br />
       <br />
       <Contact show={false} />
       <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.2/dist/full.css" rel="stylesheet" type="text/css" />

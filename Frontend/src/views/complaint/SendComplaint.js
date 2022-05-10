@@ -23,6 +23,7 @@ export default function SendComplaint () {
   const [publicId, setPublicId] = useState("");
   const[imgShow , setImgShow] = useState("null");
   const [Categorie, setCategorie] = useState("");
+  const [msg, setMsg] = useState("");
 
 
   const auth = useSelector(state => state.auth)
@@ -54,24 +55,32 @@ export default function SendComplaint () {
     setImgShow("null");
   }
   const handleSubmite = () => {
-    const credentials = { type, description, image, email, userId };
-    api.createComplaint(credentials)
-      .then(response => {
-        const result = response.data;
-        const { status, message, data } = result;
-        if (status !== 'SUCCESS') {
-          setColor("red");
-          setShow("yes");
-        }
-        else {
-          setColor("green");
-          setShow("yes");  
-          window.location.reload()
-        }
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    if(type == "" || email == ""){
+      setMsg('Type and Email are required');
+      setColor("red");
+      setShow("yes");
+    }else {
+      const credentials = { type, description, image, email, userId };
+      api.createComplaint(credentials)
+        .then(response => {
+          const result = response.data;
+          const { status, message, data } = result;
+          if (status !== 'SUCCESS') {
+            setColor("red");
+            setShow("yes");
+          }
+          else {
+            setMsg('Complaint Sended Successfully');
+            setColor("green");
+            setShow("yes");  
+            window.location.reload()
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+   
   }
 
   return (
@@ -123,7 +132,7 @@ export default function SendComplaint () {
             <div className="w-full lg:w-6/12 px-4">
               <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200">
                 <div className="flex-auto p-5 lg:p-10">
-                  <Alert message="Complaint Sended Successfully" backgroundColor={color} show={show} />
+                  <Alert message={msg} backgroundColor={color} show={show} />
                   <div className="relative w-full mb-3 mt-8" hidden={connected}>
                     <label
                       className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
@@ -171,13 +180,19 @@ export default function SendComplaint () {
                       Categorie
                     </label>
                     <span className="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 right-0 pr-3 py-3">
-                    <i className="fas fa-calendar-check"></i>                    </span>
+                      <i className="fas fa-calendar-check"></i>                    </span>
                     <select onChange={(e) => setCategorie(e.target.value)}
-                    className="border-0 px-3 py-3  text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                                          >
+                      className="border-0 px-3 py-3  text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                    >
                       <option value="">Select Your Categorie</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
+                      <option value="Computers">Computers</option>
+                      <option value="Gaming">Gaming</option>
+                      <option value="Printers">Printers</option>
+                      <option value="Sports">Sports</option>
+                      <option value="Clothes">Clothes</option>
+                      <option value="Smartphones">Smartphones</option>
+                      <option value="Security">Security</option>
+                      <option value="Tv | Recivers">Tv | Recivers</option>
                     </select>
                   </div>
 

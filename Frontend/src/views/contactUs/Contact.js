@@ -17,24 +17,24 @@ export default function Contact(props) {
 
 
   const handleSubmite = () => {
-    const credentials = {name, email, phone, description};
-    api.sendContact(credentials)
-      .then(response => {
-        const result = response.data;
-        const { status, message, data } = result;
-        if (status !== 'SUCCESS') {
-          setColor("red");
-          setShow("yes");
-        }
-        else {
-          setColor("green");
-          setShow("yes");  
-          // window.location.reload()
-        }
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    // const credentials = {name, email, phone, description};
+    // api.sendContact(credentials)
+    //   .then(response => {
+    //     const result = response.data;
+    //     const { status, message, data } = result;
+    //     if (status !== 'SUCCESS') {
+    //       setColor("red");
+    //       setShow("yes");
+    //     }
+    //     else {
+    //       setColor("green");
+    //       setShow("yes");  
+    //       // window.location.reload()
+    //     }
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //   })
   }
 
   useEffect(() => {

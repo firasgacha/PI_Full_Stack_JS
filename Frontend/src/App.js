@@ -31,6 +31,8 @@ import Translate from "./components/Translate/Translate";
 import HomePage from "./views/HomePage";
 import Chat from "views/Chat";
 import IdentityVerif from "./views/IdentityVerif";
+import PrivacySettings from "./views/PrivacySettings";
+import AboutUs from "./views/AboutUs";
 
 function App() {
 	const dispatch = useDispatch();
@@ -74,8 +76,10 @@ function App() {
 					{/* add routes without layouts */}
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/complaint" exact component={SendComplaint} />
+					<Route path="/AboutUs" exact component={AboutUs} />
 					<Route path="/message" exact component={SendMessage} />
 					<Route path="/Contact" exact component={Contact} />
+					<Route path="/PrivacySettings" exact component={PrivacySettings} />
 					<Route path="/mycomplaints" exact component={MyComplaints} />
 					<Route path="/IdentityVerif/:id" exact component={IdentityVerif} />
 					<Route path="/translate" exact component={Translate} />
