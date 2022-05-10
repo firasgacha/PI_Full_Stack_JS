@@ -77,7 +77,7 @@ function App() {
 					<Route path="/message" exact component={SendMessage} />
 					<Route path="/Contact" exact component={Contact} />
 					<Route path="/mycomplaints" exact component={MyComplaints} />
-					<Route path="/IdentityVerif" exact component={IdentityVerif} />
+					<Route path="/IdentityVerif/:id" exact component={IdentityVerif} />
 					<Route path="/translate" exact component={Translate} />
 					<Route path="/edit_user/:id" component={EditUser} exact />
 					<Route path="/user/reset/:token" exact component={ResetPassword} />

@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import IndexDropdown from "components/Dropdowns/IndexDropdown.js";
 import UserDropdown from "../Dropdowns/UserDropdown";
 import {useSelector} from "react-redux";
+import logo1 from '../../assets/img/baazar_logo.jpg';
 
 export default function Navbar(props) {
 	const [navbarOpen, setNavbarOpen] = React.useState(false);
 	const auth = useSelector(state => state.auth)
 	const {user , isLogged} = auth
+	const [logo, setLogo] = React.useState(logo1);
 	const userLink = () => {
 		return(
 			<UserDropdown/>)
@@ -25,7 +27,10 @@ export default function Navbar(props) {
 							to="/"
 							className="text-white text-sm font-bold leading-relaxed inline-block mr-4 py-2 whitespace-nowrap uppercase"
 						>
-							Baazar
+							<div class="avatar">
+									<img src={logo} style={{ width: "50px", height: "50px" }} />
+									{/* <p className="text-xl text-white">Baazar</p> */}
+							</div>
 						</Link>
 						<button
 							className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"

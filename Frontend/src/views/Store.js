@@ -153,7 +153,7 @@ export default function Store() {
 								</div>
 
 								{edit ? (
-									<div className="flex flex-wrap justify-center">
+									<div className="flex flex-wrap flex-row justify-center">
 										<input
 											type="text"
 											defaultValue={editInput.fullName}
