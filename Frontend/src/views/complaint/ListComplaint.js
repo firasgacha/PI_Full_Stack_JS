@@ -169,7 +169,10 @@ export default function GetComplaintsData() {
                   </td>
                   <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
                     {/* <TableDropdown /> */}
-                    <button class="btn btn-warning" onClick={() => ChangeStatus(item._id, item.status)}>Close Complaint</button>
+                    {item.status === 'Open' ?
+                    <button class="btn btn-error" onClick={() => ChangeStatus(item._id, item.status)}>Close Complaint</button>
+                    :<button class="btn btn-success" onClick={() => ChangeStatus(item._id, item.status)}>Open Complaint</button>
+                    }
                   </th>
                 </tr>
               )}
