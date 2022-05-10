@@ -13,7 +13,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: 1000,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -27,25 +27,27 @@ export default function ModalImage(props) {
 
     return (
         <div>
-            {props.image ? 
-            <button class='btn text-white' onClick={handleOpen}><ImageIcon/> Screenshot</button> : 
-            <Button disabled>No image uploaded</Button>}
+            {props.image ?
+                <button className='btn text-white' onClick={handleOpen}><ImageIcon /> Screenshot</button> :
+                <Button disabled>No image uploaded</Button>}
+
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                
-                <Box sx={style}>
-                <Fab size="medium" color="primary" aria-label="add" onClick={handleClose}>
-                    <CloseIcon/>
-                </Fab>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        <Image cloudName="du8mkgw6r" publicId={props.image} />
-                    </Typography>
+
+                <Box sx={style}> 
+                    <div className='flex justify-center mb-2'>
+                    <Image cloudName="du8mkgw6r" publicId={props.image} style={{ height: 400, width: 800 }} />
+                    </div>
+                    <div className='flex justify-center'>
+                        <button className='btn' onClick={handleClose}>Close</button>
+                    </div>
                 </Box>
             </Modal>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
         </div>
     );
 }

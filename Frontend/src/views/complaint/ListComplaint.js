@@ -12,12 +12,9 @@ export default function GetComplaintsData() {
   const [Data, setData] = useState([]);
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
+  //Auth
   const auth = useSelector(state => state.auth)
-  const token = useSelector(state => state.token)
-  const [connected, setConnceted] = useState(false);
   const { user, isAdmin } = auth
-  const [callback, setCallback] = useState(false)
-  const dispatch = useDispatch()
 
   // Get All Complaints Data
   const GetComplaintsData = () => {
@@ -56,18 +53,9 @@ export default function GetComplaintsData() {
 
   useEffect(() => {
     GetComplaintsData();
-  }, []);
+  }, [user]);
 
-  useEffect(() => {
-    if (token) {
-      fetchUser(token).then(res => {
-        dispatch(dispatchGetUser(res))
-        setUserId(res.data._id)
-        setUserName(res.data.name)
-        setConnceted(true)
-      })
-    }
-  }, [token, isAdmin, dispatch, callback, userId])
+
   return (
     <>
       <div
