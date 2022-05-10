@@ -13,7 +13,7 @@ function ActivationEmail() {
         if(activation_token){
             const activationEmail = async () => {
                 try {
-                    const res = await axios.post('http://localhost:5000/user/activation', {activation_token})
+                    const res = await axios.post('https://baazartunisie.herokuapp.com/user/activation', {activation_token})
                     setSuccess(res.data.msg)
                     history.push("/auth/login")
                 } catch (err) {

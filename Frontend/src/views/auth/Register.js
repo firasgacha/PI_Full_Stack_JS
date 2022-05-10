@@ -39,7 +39,7 @@ export default function Register() {
     if(!isMatch(password ,cf_password))
       return setUser({...user, err: "Password did not match", success:''})
     try{
-        const res = await axios.post('http://localhost:5000/user/register',{
+        const res = await axios.post('https://baazartunisie.herokuapp.com/user/register',{
           name,email, password,address,city,state,zip,country,telephone
         })
       setUser({...user, err:'', success: res.data.msg})

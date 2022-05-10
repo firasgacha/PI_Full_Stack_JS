@@ -86,7 +86,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "https://baazartunisie.herokuapp.com",
   "optionalDependencies": {
     "typescript": "4.2.3"
   }
