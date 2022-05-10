@@ -30,10 +30,18 @@ module.exports = {
 
 	// save message to db
 	saveMessage(user, idRoom, message) {
-		console.log(users);
-		Chat.findOne({ id: idRoom }).then((chat) => {
-			chat.messages.push(message);
-			chat.save();
+		console.log("Saving message");
+		console.log(idRoom);
+		console.log(message);
+		Chat.findByIdAndUpdate(
+			{ _id: idRoom },
+			{
+				$push: {
+					messages: { ...message },
+				},
+			}
+		).then((chat) => {
+			console.log(chat);
 		});
 	},
 };
