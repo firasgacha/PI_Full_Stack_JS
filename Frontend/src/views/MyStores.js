@@ -7,17 +7,21 @@ import { useSelector } from "react-redux";
 
 export default function Store() {
 	const { user, isAdmin } = useSelector((state) => state.auth);
-	const { id } = useParams();
+	let { id } = useParams(user._id);
 	const [StoreInfo, setStoreInfo] = useState([]);
+	const [name, setName] = useState("");
 
 	useEffect(() => {
-		axios.get(`/store/api/owner/${id}`).then((res) => {
+		const idUser = id ? id : user._id;
+		axios.get(`/store/api/owner/${idUser}`).then((res) => {
 			if (res.data) {
-				res.data.map((el) => (el.createdAt = el.createdAt.slice(0, 10)));
-				setStoreInfo(res.data);
+				res.data.stores.map((el) => (el.createdAt = el.createdAt.slice(0, 10)));
+				console.log(res.data);
+				setStoreInfo(res.data.stores);
+				setName(res.data.userName);
 			}
 		});
-	}, []);
+	}, [id, user]);
 
 	const storeExists = () => {
 		return (
@@ -32,7 +36,7 @@ export default function Store() {
 											user._id === id ? (
 												<h1 className="text-xl">Your Stores:</h1>
 											) : (
-												<h1 className="text-xl">{user.name} Stores:</h1>
+												<h1 className="text-xl">{name}'s Store</h1>
 											)
 										) : (
 											<h1 className="text-xl">Stores:</h1>
@@ -48,7 +52,12 @@ export default function Store() {
 													<div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-lightBlue-500">
 														<img
 															alt="..."
-															src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
+															src={
+																!el.profileImage ||
+																el.profileImage === "defaultStorePic.png"
+																	? "https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+																	: el.profileImage
+															}
 															className="w-full align-middle rounded-t-lg"
 														/>
 														<blockquote className="relative p-8 mb-4">

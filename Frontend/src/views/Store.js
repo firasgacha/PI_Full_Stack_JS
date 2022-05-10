@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 import axios from "axios";
 
 const StoreInfoInit = {
@@ -153,99 +153,146 @@ export default function Store() {
 								</div>
 
 								{edit ? (
-									<div className="flex flex-wrap flex-row justify-center">
-										<input
-											type="text"
-											defaultValue={editInput.fullName}
-											onInput={(e) => {
-												editInput.fullName = e.target.value;
-											}}
-										/>
-										<label htmlFor="file_up" className="cursor-pointer ml-1">
-											Change Profile Picture
-										</label>
-										<input
-											type="file"
-											name="file"
-											id="file_up"
-											className="hidden"
-											onChange={changeAvatar}
-										/>
-										<input
-											type="text"
-											placeholder="Description"
-											defaultValue={editInput.description}
-											onChange={(e) => {
-												editInput.description = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Address"
-											defaultValue={editInput.address}
-											onChange={(e) => {
-												editInput.address = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Phone"
-											defaultValue={editInput.phone}
-											onChange={(e) => {
-												editInput.phone = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Email"
-											defaultValue={editInput.email}
-											onChange={(e) => {
-												editInput.email = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Website"
-											defaultValue={editInput.website}
-											onChange={(e) => {
-												editInput.website = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Facebook"
-											defaultValue={editInput.facebook}
-											onChange={(e) => {
-												editInput.facebook = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Instagram"
-											defaultValue={editInput.instagram}
-											onChange={(e) => {
-												editInput.instagram = e.target.value;
-											}}
-										/>
-										<input
-											type="text"
-											placeholder="Twitter"
-											defaultValue={editInput.twitter}
-											onChange={(e) => {
-												editInput.twitter = e.target.value;
-											}}
-										/>
-										<button onClick={submitInfo}>Submit</button>
+									<div className="container mx-auto px-4">
+										<div
+											style={
+												({ display: "flex" },
+												{ flexDirection: "column" },
+												{ alignContent: "center" },
+												{ justifyContent: "center" })
+											}
+										>
+											<div>
+												<input
+													type="text"
+													defaultValue={editInput.fullName}
+													onInput={(e) => {
+														editInput.fullName = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Description"
+													defaultValue={editInput.description}
+													onChange={(e) => {
+														editInput.description = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<label
+													htmlFor="file_up"
+													className="cursor-pointer ml-1"
+												>
+													Change Profile Picture
+												</label>
+												<input
+													type="file"
+													name="file"
+													id="file_up"
+													className="hidden"
+													onChange={changeAvatar}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Address"
+													defaultValue={editInput.address}
+													onChange={(e) => {
+														editInput.address = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Phone"
+													defaultValue={editInput.phone}
+													onChange={(e) => {
+														editInput.phone = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Email"
+													defaultValue={editInput.email}
+													onChange={(e) => {
+														editInput.email = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Website"
+													defaultValue={editInput.website}
+													onChange={(e) => {
+														editInput.website = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Facebook"
+													defaultValue={editInput.facebook}
+													onChange={(e) => {
+														editInput.facebook = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Instagram"
+													defaultValue={editInput.instagram}
+													onChange={(e) => {
+														editInput.instagram = e.target.value;
+													}}
+												/>
+											</div>
+											<div>
+												<input
+													type="text"
+													placeholder="Twitter"
+													defaultValue={editInput.twitter}
+													onChange={(e) => {
+														editInput.twitter = e.target.value;
+													}}
+												/>
+											</div>
+											{StoreInfo.verified ? (
+												""
+											) : (
+												<div>
+													<Link to={`/identityVerif/${id}`}>
+														Verify your account
+													</Link>
+												</div>
+											)}
+
+											<button onClick={submitInfo}>Submit</button>
+										</div>
 									</div>
 								) : (
 									<div className="w-100 mb-12 flex flex-row justify-between">
 										<div className="px-5 text-xl">
-											<h1>{StoreInfo.fullName}</h1>
-											{StoreInfo.verified ? (
-												<i className="verified text-blue-600"></i>
-											) : (
-												""
-											)}
+											<h1>
+												{StoreInfo.fullName}
+												{StoreInfo.verified ? (
+													<i
+														className="fa fa-check"
+														style={{ color: "#54C6F9", margin: "0px 5px" }}
+													></i>
+												) : (
+													""
+												)}
+											</h1>
 											<h2>{StoreInfo.description}</h2>
 											<h3>Since {StoreInfo.createdAt}</h3>
 										</div>
@@ -299,7 +346,7 @@ export default function Store() {
 							</div>
 							<h1 className="text-center text-lg mb-5">
 								{" "}
-								{StoreInfo.fullName}'s Products :
+								{/* {StoreInfo.fullName}'s Products : */}
 							</h1>
 							<div className="flex flex-row justify-evenly">
 								{products.map((product) => (

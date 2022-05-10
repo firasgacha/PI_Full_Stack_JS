@@ -89,7 +89,7 @@ function App() {
 					<Route path="/landing" exact component={Landing} />
 					<Route path="/store/:id" exact component={Store} />
 					<Route path="/chats/:id" exact component={isLogged ? Chat : Auth} />
-					<Route path="/user-stores/:id" exact component={MyStores} />
+					<Route path="/user-stores/:id?" exact component={MyStores} />
 					<Route path="/profile" exact component={isLogged ? Profile : Auth} />
 					<Route path="/" exact component={HomePage} />
 					{/* add redirect for first page */}

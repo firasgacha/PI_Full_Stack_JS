@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Store } = require("../models/store.model");
-const { User } = require("../models/user.model");
+const User = require("../models/user.model");
 
 module.exports = {
 	getStore: (req, res) => {
@@ -13,7 +13,10 @@ module.exports = {
 	getStoreByUser: (req, res) => {
 		try {
 			Store.find({ owner: req.params.owner }).then((stores) =>
-				res.json(stores)
+				User.findOne({ _id: req.params.owner }).then((user) => {
+					console.log("test");
+					res.json({ stores, userName: user.name });
+				})
 			);
 		} catch (error) {
 			res.status(404).json({ message: error.message });
