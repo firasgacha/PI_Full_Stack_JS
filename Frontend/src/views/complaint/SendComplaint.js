@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import Navbar from "components/Navbars/AuthNavbar.js";
+import Navbar from 'components/Navbars/IndexNavbar';
 import Footer from "components/Footers/Footer.js";
 import * as api from '../../api/Api';
 import axios from "axios";
@@ -7,6 +7,7 @@ import { Image } from 'cloudinary-react';
 import Alert from '../../components/Alert/Alert';
 import {fetchUser,dispatchGetUser} from '../../redux/actions/authAction';
 import {useDispatch, useSelector} from "react-redux";
+import { Link } from 'react-router-dom';
 
 export default function SendComplaint () {
   //Define here local state that store the form Data
@@ -25,22 +26,14 @@ export default function SendComplaint () {
 
 
   const auth = useSelector(state => state.auth)
-  const token = useSelector(state => state.token)
-  const users = useSelector(state => state.users)
   const{user, isAdmin} = auth
-  const [callback , setCallback] = useState(false)
-  const dispatch = useDispatch()
+
 
   useEffect(() => {
-    if(token){
-      fetchUser(token).then(res =>{
-        dispatch(dispatchGetUser(res))
-        setUserId(res.data._id)
-        setEmail(res.data.email)
-        setConnceted(true)       
-      })
+    if(user.length != 0){
+      setConnceted(true);
     }
-  },[token, isAdmin, dispatch, callback])
+  },[])
 
   const PostImage = () => {
     const formData = new FormData();
@@ -84,6 +77,7 @@ export default function SendComplaint () {
   return (
     <>
       <Navbar transparent />
+      <br />
       <section className="pb-20 relative block bg-blueGray-800">
         <div
           className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
@@ -117,6 +111,8 @@ export default function SendComplaint () {
                 Please tell us more so we can resolve the
                 issue and improve
               </p>
+              <p className="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">Or</p>
+              <Link to="/contact" className="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">Contact Us</Link>
             </div>
           </div>
         </div>
@@ -242,6 +238,7 @@ export default function SendComplaint () {
         </div>
       </section>
       <Footer />
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.2/dist/full.css" rel="stylesheet" type="text/css" />
     </>
   );
 }

@@ -148,7 +148,7 @@ export default function Sidebar() {
 								>
 									<i
 										className={
-											"fas fa-search-plus mr-2 text-sm " +
+											"fas fa-file-contract " +
 											(window.location.href.indexOf("/admin/products") !== -1
 												? "opacity-75"
 												: "text-blueGray-300")
@@ -157,7 +157,28 @@ export default function Sidebar() {
 									Complaints
 								</Link>
 							</li>
-
+							<li className="items-center">
+								<Link
+									className={
+										"text-xs uppercase py-3 font-bold block " +
+										(window.location.href.indexOf("/admin/complaints=") !== -1
+											? "text-lightBlue-500 hover:text-lightBlue-600"
+											: "text-blueGray-700 hover:text-blueGray-500")
+									}
+									to="/admin/contacts"
+								>
+									<i
+										className={
+											"fas fa-comment " +
+											(window.location.href.indexOf("/admin/products") !== -1
+												? "opacity-75"
+												: "text-blueGray-300")
+										}
+									></i>{" "}
+									Contacts
+								</Link>
+							</li>
+							
 							<li className="items-center">
 								<Link
 									className={
@@ -179,12 +200,11 @@ export default function Sidebar() {
 									Maps
 								</Link>
 							</li>
-						</ul>
-						<li className="items-center">
+							<li className="items-center">
 								<Link
 									className={
 										"text-xs uppercase py-3 font-bold block " +
-										(window.location.href.indexOf("/admin/complaints=") !== -1
+										(window.location.href.indexOf("/admin/maps") !== -1
 											? "text-lightBlue-500 hover:text-lightBlue-600"
 											: "text-blueGray-700 hover:text-blueGray-500")
 									}
@@ -192,8 +212,8 @@ export default function Sidebar() {
 								>
 									<i
 										className={
-											"fas fa-search-plus mr-2 text-sm " +
-											(window.location.href.indexOf("/admin/products") !== -1
+											"fas fa-cog mr-2 text-sm " +
+											(window.location.href.indexOf("/admin/maps") !== -1
 												? "opacity-75"
 												: "text-blueGray-300")
 										}
@@ -201,6 +221,8 @@ export default function Sidebar() {
 									Settings
 								</Link>
 							</li>
+						</ul>
+						
 
 						{/* Divider */}
 						<hr className="my-4 md:min-w-full" />

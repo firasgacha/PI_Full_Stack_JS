@@ -20,3 +20,7 @@ export const getAllProducts = () => axios.get(`${url}/products/getjson`);
 
 //update store verification
 export const verifyStore = (id) => axios.patch(`${url}/store/api/verify/${id}`);
+
+//contacts
+export const getAllContacts = () => axios.get(`${url}/Contact/getContacts`);
+export const sendContact = (newContact) => axios.post(`${url}/contacts/addContact/`,newContact);
