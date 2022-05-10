@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // components
 
 import CardStats from "components/Cards/CardStats.js";
+import * as api from '../../api/Api';
+import {useSelector} from "react-redux";
+
 
 export default function HeaderStats() {
+  const [complaintsCount, setComplaintsCount] = React.useState(0);
+  const [userCount, setUserCount] = React.useState(0);
+  const [productCount, setProductCount] = React.useState(0);
+  const [StoresCount, setStoresCount] = React.useState(0);
+  const users = useSelector(state => state.users)
+
+  useEffect (() => {
+    api.getAllComplaint().then(response => {const result = response.data; setComplaintsCount(result.data.length)})
+    setUserCount(users.length);
+
+  })
   return (
     <>
       {/* Header */}
@@ -15,8 +29,8 @@ export default function HeaderStats() {
             <div className="flex flex-wrap">
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
-                  statSubtitle="TRAFFIC"
-                  statTitle="350,897"
+                  statSubtitle="Complaints"
+                  statTitle={complaintsCount}
                   statArrow="up"
                   statPercent="3.48"
                   statPercentColor="text-emerald-500"
@@ -27,8 +41,8 @@ export default function HeaderStats() {
               </div>
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
-                  statSubtitle="NEW USERS"
-                  statTitle="2,356"
+                  statSubtitle="Total USERS"
+                  statTitle={userCount}
                   statArrow="down"
                   statPercent="3.48"
                   statPercentColor="text-red-500"
@@ -39,8 +53,8 @@ export default function HeaderStats() {
               </div>
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
-                  statSubtitle="SALES"
-                  statTitle="924"
+                  statSubtitle="Products"
+                  statTitle="234"
                   statArrow="down"
                   statPercent="1.10"
                   statPercentColor="text-orange-500"
@@ -51,8 +65,8 @@ export default function HeaderStats() {
               </div>
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
-                  statSubtitle="PERFORMANCE"
-                  statTitle="49,65%"
+                  statSubtitle="Stores"
+                  statTitle="53"
                   statArrow="up"
                   statPercent="12"
                   statPercentColor="text-emerald-500"

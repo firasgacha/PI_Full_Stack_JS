@@ -1,14 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from "face-api.js";
 import CircularProgress from '@material-ui/core/CircularProgress/';
-import Button from '@material-ui/core/Button/';
 import Backdrop from '@material-ui/core/Backdrop/';
 import Navbar from '../components/Navbars/IndexNavbar';
 import Footer from '../components/Footers/Footer';
+import * as api from '../api/Api';
+import { useParams, useHistory} from "react-router-dom";
+
+
 //Imgs
 import defaultImg from '../assets/img/cin.png';
-export default function IdentityVerif() {
 
+export default function IdentityVerif() {
+    const { id } = useParams();
     const [firstImg, setFirstImg] = useState('');
     const [secondImg, setSecondImg] = useState(defaultImg);
     const [noFacesFound, setNoFacesFound] = useState(false);
@@ -25,14 +29,14 @@ export default function IdentityVerif() {
     const [step4, setStep4] = useState("step");
     //image size
     const [sizeAlert, setSizeAlert] = useState('');
+    const [value, setValue] = useState(5);
+    const history = useHistory();
 
-    // const handleFirstImageUpload = (e) => {
-    //     let img = e.target.files[0];
-    //     let canvas = document.getElementById('canvas1');
-    //     const context = canvas.getContext('2d');
-    //     context.clearRect(0, 0, canvas.width, canvas.height);
-    //     setFirstImg(URL.createObjectURL(img));
-    // }
+    //verifiy store
+    const verifyStore = async () => {
+        api.verifyStore(id)
+        .catch(err => console.log(err));
+    };
 
     const handleSecondImageUpload = (e) => {
         let img = e.target.files[0];
@@ -88,6 +92,13 @@ export default function IdentityVerif() {
             setMatchFound("found");
             setLoading(false);
             setStep4('step step-primary');
+            verifyStore();
+            // let video = videoRef.current;
+            // video.getVideoTracks()[0].stop();
+            videoRef.current.srcObject.getVideoTracks()[0].stop();
+            setTimeout(() => {
+                history.push(`/store/${id}`);
+            }, 5000);
         }
         else {
             setMatchFound("not found");
@@ -150,7 +161,8 @@ export default function IdentityVerif() {
     useEffect(() => {
         loadModels();
         getUserCamera();
-    }, [])
+        
+    }, [id])
     return (
         <>
             <Navbar />
@@ -160,7 +172,14 @@ export default function IdentityVerif() {
             <br />
             <br />
             <br />
-            <div class="flex flex-row flex-wrap justify-around">
+            {matchFound == "found" ?
+            <div className="flex justify-center mb-4">
+            <div class="badge badge-success gap-2 text-xl">
+                You will be redirecting to your store, please wait
+            </div>
+            </div>
+            :null}
+            <div className="flex flex-row flex-wrap justify-around">
                 <div className="flex-col">
                     <div className="flex justify-center mb-2">
                         <div class="badge badge-lg">Upload your identity passport or national identity</div>
