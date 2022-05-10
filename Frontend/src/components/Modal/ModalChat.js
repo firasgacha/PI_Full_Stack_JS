@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import ChatBox from '../../components/Message/index';
+import Box from '@mui/material/Box';
+
 
 const style = {
   // position: 'fixed',
@@ -17,10 +17,15 @@ const style = {
 };
 
 export default function ModalChat(props) {
+
+  //
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [onOFF, setOnOFF] = React.useState(true);
+
+  
+  //
   React.useEffect(() => {
     if (props.onOFF !=='Open') {
       setOnOFF(true);
@@ -30,7 +35,7 @@ export default function ModalChat(props) {
   }, [props.onOFF]);
   return (
     <div>
-      <Button onClick={handleOpen} disabled={onOFF}>Open Chat</Button>
+      <button className="btn btn-ghost"onClick={handleOpen} disabled={onOFF}>Open Chat</button>
       <Modal
         open={open}
         onClose={handleClose}
