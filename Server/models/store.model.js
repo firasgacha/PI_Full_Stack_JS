@@ -6,7 +6,6 @@ const store = new mongoose.Schema(
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "user",
-			required: true,
 		},
 		profileImage: { type: String, default: "" },
 		coverImage: { type: String, default: "defaultCoverPic.png" },
@@ -14,6 +13,7 @@ const store = new mongoose.Schema(
 		address: { type: String, default: "No address" },
 		phone: { type: String, default: "No phone" },
 		email: { type: String, default: "No email" },
+		localisation: { type: String, default: "37.280236, 9.873783" },
 		contact: {
 			website: { type: String, default: "No website" },
 			facebook: { type: String, default: "No facebook" },

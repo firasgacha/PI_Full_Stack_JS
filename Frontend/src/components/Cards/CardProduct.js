@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 import {useApi} from "../../hooks/useApi";
 import useScript from "../../hooks/useScripts";
@@ -8,6 +8,7 @@ import AddModifyProduct from "./AddModifyProduct";
 import { browserHistory } from 'react-router';
 import i from "styled-components/macro";
 import ListFeedbacksRatingsImages from "./ListFeedbacksRatingsImages";
+import {Alert} from "@mui/material";
 
 const customStyles = {
     overlay: {
@@ -39,47 +40,127 @@ Modal.setAppElement('body');
 export default function CardProduct() {
     const[formdata,setFormData]=useState({
         categorie:"",
+        description:"",
         price:0,
         etat:"",
         multi_files:[]
     })
     const [value, setValue] = useState("");
     const [type, setType] = useState("");
-    const [products,err,relaod]= useApi('getjson');
+    let [products,err,relaod]= useApi('products/getjson');
+    let [productstimer,errtimer,relaodtimer]= useApi('products/getjson');
     const [errors, setErrors] = useState({ visbile: false, message: "" });
+    const [show, setShow] = useState(false);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+    let goto;
     var save=[];
+    let check_add=false;
+    let check_del=false;
+    let msg;
+
+    useEffect(() => {
+        const interval = setInterval(relaodtimer, 1000);
+        return () => {
+            clearInterval(interval);}
+    }, []);
 
     const handleChange = (event) => {
-        console.log(value)
         setValue(event.target.value);
-
     };
 
-    for (var i in products)
-        if(products[i]['Categorie']['name'].indexOf(value)!=-1 || products[i]['Etat'].indexOf(value)!=-1 ||
-            products[i]['Price'].toString().indexOf(value)!=-1)
-            save.push(products[i]);
+    // console.log("*******************Product*******************")
+    // console.log(products)
+    // console.log("*******************Product Timer*******************")
+    // console.log(productstimer)
+
+    /**
+     * Suppression d'une manière dynamique
+     */
+    if(productstimer!=null) {
+        if (productstimer.length) {
+            for (var a in productstimer) {
+                for (var b in products) {
+                    for (var c in productstimer) {
+                        if (products[b]['_id'] == productstimer[c]['_id']) {
+                            check_del = true
+                        }
+                    }
+                    if (!check_del)
+                        products.splice(products[b], 1)
+                    check_del = false;
+                }
+            }
+        }else
+            products.length=0
+        }
+
+    /**
+     * Ajout,Modification
+     * d'une manière dynamique
+     */
+    for (var i in productstimer) {
+        for (var j in products) {
+            if (productstimer[i]['_id'] == products[j]['_id']) {
+                if (products[j]['Categorie']['name'] != productstimer[i]['Categorie']['name'])
+                        products[j]['Categorie']['name'] = productstimer[i]['Categorie']['name']
+                if (products[j]['Description'] != productstimer[i]['Description'])
+                    products[j]['Description'] = productstimer[i]['Description']
+                if (products[j]['Etat'] != productstimer[i]['Etat'])
+                        products[j]['Etat'] = productstimer[i]['Etat']
+                if (products[j]['Price'].toString() != productstimer[i]['Price'].toString())
+                        products[j]['Price'] = productstimer[i]['Price']
+                if (!(JSON.stringify(products[j]['Feedback']) === JSON.stringify(productstimer[i]['Feedback'])))
+                        products[j]['Feedback'] = productstimer[i]['Feedback']
+                if (!(JSON.stringify(products[j]['Rate']) === JSON.stringify(productstimer[i]['Rate'])))
+                        products[j]['Rate'] = productstimer[i]['Rate']
+                if (!(JSON.stringify(products[j]['Images']) === JSON.stringify(productstimer[i]['Images'])))
+                        products[j]['Images'] = productstimer[i]['Images']
+                check_add = true;
+                }
+            }
+            if (!check_add)
+                products.push(productstimer[i])
+
+            check_add = false;
+        }
+
+    /**
+     * Search
+     */
+    for (var k in products)
+        if(products[k]['Categorie']['name'].indexOf(value)!=-1 || products[k]['Etat'].indexOf(value)!=-1 || products[k]['Description'].indexOf(value)!=-1 ||
+            products[k]['Price'].toString().indexOf(value)!=-1)
+            save.push(products[k]);
 
     if(value=="")
         save=products;
 
-    const [modalIsOpen, setIsOpen] = React.useState(false);
-
+    /**
+     * Notifications
+     */
+    if(show)
+        msg=<Alert severity="error" onClose={() => setShow(false)} >
+            Oops! Product sold out and no more available.
+        </Alert>
     async function Delete(id) {
         if (window.confirm("Are you sure ?")) {
-            const [, err] = await queryApi("delete", id, "POST", false);
+            const [, err] = await queryApi("products/delete", id, "POST", false);
             if (err) {
                 setErrors({
                     visbile: true,
                     message: JSON.stringify(err.errors, null, 2),
                 });
             }
-            else
-                window.location.reload(false);
+            setShow(true)
+            setTimeout(()=>setShow(false),3000);
+
         }
 
     }
 
+    /**
+     * One Modal for (Add,Modify,display:{ratings,feedbacks})
+     */
     function ModalAdd() {
         setType("Add");
         setIsOpen(true);
@@ -88,6 +169,7 @@ export default function CardProduct() {
     function ModalRatings(prod) {
         setFormData({
             categorie:prod['prod'].Categorie.name,
+            description:prod['prod'].Description,
             price:prod['prod'].Price,
             etat:prod['prod'].Etat,
             multi_files:prod['prod'].Images,
@@ -100,6 +182,7 @@ export default function CardProduct() {
     function ModalFeedbacks(prod) {
         setFormData({
             categorie:prod['prod'].Categorie.name,
+            description:prod['prod'].Description,
             price:prod['prod'].Price,
             etat:prod['prod'].Etat,
             multi_files:prod['prod'].Images,
@@ -112,6 +195,7 @@ export default function CardProduct() {
     function ModalImages(prod) {
         setFormData({
             categorie:prod['prod'].Categorie.name,
+            description:prod['prod'].Description,
             price:prod['prod'].Price,
             etat:prod['prod'].Etat,
             multi_files:prod['prod'].Images
@@ -119,10 +203,12 @@ export default function CardProduct() {
         setType("Images");
         setIsOpen(true);
     }
+
     function ModalModify(prodmodify) {
         setFormData({
             id_p:prodmodify['prodmodify']._id,
             categorie:prodmodify['prodmodify'].Categorie.name,
+            description:prodmodify['prodmodify'].Description,
             price:prodmodify['prodmodify'].Price,
             etat:prodmodify['prodmodify'].Etat,
             multi_files:prodmodify['prodmodify'].Images
@@ -136,12 +222,13 @@ export default function CardProduct() {
         setIsOpen(false);
         setFormData({
             categorie:"",
+            description:"",
             price:0,
             etat:"",
             multi_files:[]
         });
     }
-    let goto;
+
     if(type=="Add")
         goto=<AddModifyProduct type={type} formdata={formdata}/>
     if(type=="Modify")
@@ -187,6 +274,9 @@ export default function CardProduct() {
                         }>Categorie</th>
                         <th className={
                             "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " + "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                        }>Description</th>
+                        <th className={
+                            "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " + "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                         }>Price</th>
                         <th className={
                             "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " + "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
@@ -215,8 +305,11 @@ export default function CardProduct() {
                             <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                 {prod.Store.FullName}
                             </td>
-                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs p-4" style={{whiteSpace:"pre-line"}}>
                                 {prod.Categorie.name}
+                            </td>
+                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs p-4" style={{whiteSpace:"pre-line"}}>
+                                {prod.Description}
                             </td>
                             <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                 {prod.Price}
@@ -258,6 +351,7 @@ export default function CardProduct() {
                         </div>
                     </Modal>
                 </div>
+                {msg}
             </div>
         </>
 
